@@ -67,6 +67,7 @@
   .top-bar {
     background: #000;
     padding-top: var(--safe-top);
+    padding-bottom: 16px;
     flex-shrink: 0;
   }
   .header {
@@ -139,9 +140,11 @@
     overflow-x: hidden;
     background: var(--bg);
     border-radius: 16px 16px 0 0;
-    margin-top: -8px;
+    margin-top: -16px;
     padding-bottom: 80px;
     -webkit-overflow-scrolling: touch;
+    position: relative;
+    z-index: 2;
   }
   
   /* Filtre period */
@@ -190,7 +193,8 @@
     position: relative;
     overflow: hidden;
     margin-bottom: 16px;
-    height: 80px;
+    height: 90px;
+    padding-top: 4px;
     touch-action: pan-y;
   }
   .stats-track {
@@ -209,7 +213,6 @@
     position: relative;
     transition: opacity 0.4s;
     user-select: none;
-    overflow: hidden;
     white-space: nowrap;
   }
   /* Active = large, contenu visible */
@@ -1538,6 +1541,8 @@ function applyCarouselLayout(animate = true) {
   for (let i = 0; i < visualIdx; i++) {
     offset += tiles[i].offsetWidth;
   }
+  // Small offset compensation so first pixel of text is not cut at left edge
+  offset -= 6;
   
   if (animate) {
     track.style.transition = 'transform 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
