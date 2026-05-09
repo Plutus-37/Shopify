@@ -43,7 +43,7 @@
   
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-    background: #000;
+    background: #fff;
     color: var(--text);
     font-size: 15px;
     line-height: 1.4;
@@ -1948,14 +1948,12 @@ async function fireNotification() {
   if (!settings.push) return;
   const data = buildNotifData();
   
-  // In-app iOS-style banner
-  showInAppNotif(data);
-  
-  // Real system notification (only works if permission granted; works in background if PWA installed)
+  // Check real notification permission
   const perm = await ensureNotifPermission();
+  
   if (perm === 'granted') {
+    // Real iOS system notification (works in background if PWA installed)
     try {
-      // Tiny inline icon (Shopify green bag)
       const iconDataURI = SHOPIFY_ICON_B64;
       new Notification(data.title, {
         body: data.body,
@@ -1966,7 +1964,12 @@ async function fireNotification() {
       });
     } catch (e) {
       console.warn('Notification failed:', e);
+      // Fallback to in-app banner if real notif fails
+      showInAppNotif(data);
     }
+  } else {
+    // No permission → fall back to in-app banner so user still sees something
+    showInAppNotif(data);
   }
   
   // Play sound
