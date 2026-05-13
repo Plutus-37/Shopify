@@ -219,7 +219,7 @@
   /* Active = large, contenu visible */
   .stat-tile.active {
     opacity: 1;
-    min-width: 240px;
+    min-width: 280px;
     padding-right: 24px;
   }
   .stat-tile.active .label {
@@ -426,36 +426,63 @@
   /* Tab bar */
   .tab-bar {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    border-top: 1px solid var(--border);
+    bottom: calc(8px + var(--safe-bottom));
+    left: 12px;
+    right: 12px;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    padding: 8px 8px calc(8px + var(--safe-bottom));
+    gap: 8px;
     z-index: 10;
+    pointer-events: none; /* let children handle clicks */
+  }
+  .tab-dock {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 0.5px solid rgba(255, 255, 255, 0.6);
+    border-radius: 22px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12), 0 0 0 0.5px rgba(0,0,0,0.06);
+    pointer-events: auto;
+  }
+  .tab-dock-main {
+    flex: 1; /* takes available space between the two single docks */
+  }
+  .tab-dock-single {
+    flex-shrink: 0; /* keep size of single icon */
   }
   .tab-item {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 44px;
+    height: 40px;
+    min-width: 40px;
     color: var(--text-muted);
     cursor: pointer;
-    border-radius: 12px;
+    border-radius: 16px;
     position: relative;
+    transition: background 0.15s;
+  }
+  .tab-dock-single .tab-item {
+    flex: 0 0 auto;
+    width: 40px;
+    border-radius: 50%;
   }
   .tab-item.active {
-    background: #e1e3e5;
+    background: white;
     color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.04);
   }
   .tab-item:active { opacity: 0.6; }
   .tab-item svg { width: 22px; height: 22px; }
   .tab-item .me-circle {
-    width: 26px; height: 26px;
+    width: 28px; height: 28px;
     border-radius: 50%;
     background: linear-gradient(135deg, #c084fc, #9333ea);
     display: flex; align-items: center; justify-content: center;
@@ -1476,23 +1503,29 @@
   </div>
   
   <div class="tab-bar">
-    <div class="tab-item" data-tab="search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <div class="tab-dock tab-dock-single">
+      <div class="tab-item" data-tab="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </div>
     </div>
-    <div class="tab-item active" data-tab="home">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    <div class="tab-dock tab-dock-main">
+      <div class="tab-item active" data-tab="home">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      </div>
+      <div class="tab-item" data-tab="orders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </div>
+      <div class="tab-item" data-tab="discounts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+      </div>
+      <div class="tab-item" data-tab="menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </div>
     </div>
-    <div class="tab-item" data-tab="orders">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-    </div>
-    <div class="tab-item" data-tab="discounts">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
-    </div>
-    <div class="tab-item" data-tab="menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </div>
-    <div class="tab-item" data-tab="me">
-      <div class="me-circle">EL</div>
+    <div class="tab-dock tab-dock-single">
+      <div class="tab-item" data-tab="me">
+        <div class="me-circle">EL</div>
+      </div>
     </div>
   </div>
   
@@ -2861,23 +2894,105 @@ function buildNotifData() {
 
 // Increment stats based on a new order, with smooth animation
 function incrementStatsWithOrder(orderData) {
-  // Total sales
-  stats.totalSales.value += orderData.amount;
-  // Orders count
-  stats.orders.value += 1;
-  // Sessions: random 1-3 new sessions per order (realistic)
-  stats.sessions.value += Math.floor(Math.random() * 3) + 1;
-  // Conversion: orders/sessions * 100
-  stats.conversion.value = (stats.orders.value / stats.sessions.value) * 100;
+  // Capture old values
+  const oldTotalSales = stats.totalSales.value;
+  const oldOrders = stats.orders.value;
+  const oldSessions = stats.sessions.value;
+  const oldConversion = stats.conversion.value;
   
-  // Refresh display
-  updateAllTilesDisplay();
+  // Compute new values
+  const newTotalSales = oldTotalSales + orderData.amount;
+  const newOrders = oldOrders + 1;
+  const newSessions = oldSessions + Math.floor(Math.random() * 3) + 1;
+  const newConversion = (newOrders / newSessions) * 100;
+  
+  // Set final values immediately (so saveState + future calls work correctly)
+  stats.totalSales.value = newTotalSales;
+  stats.orders.value = newOrders;
+  stats.sessions.value = newSessions;
+  stats.conversion.value = newConversion;
+  
+  // Animate the visual values from old to new
+  animateStatValue('totalSales', oldTotalSales, newTotalSales);
+  animateStatValue('orders', oldOrders, newOrders);
+  animateStatValue('sessions', oldSessions, newSessions);
+  animateStatValue('conversion', oldConversion, newConversion);
   
   // Persist
   saveState();
   
   // Add this order to history
   addOrderToHistory(orderData);
+}
+
+// Animation map: prevents overlapping animations on the same stat
+const _statAnimations = {};
+
+function animateStatValue(stat, fromVal, toVal) {
+  // Cancel any running animation for this stat
+  if (_statAnimations[stat]) {
+    cancelAnimationFrame(_statAnimations[stat].rafId);
+  }
+  
+  const duration = 700; // ms
+  const startTime = performance.now();
+  const delta = toVal - fromVal;
+  
+  // Ease-out cubic for smooth deceleration
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  
+  const step = (now) => {
+    const elapsed = now - startTime;
+    const t = Math.min(elapsed / duration, 1);
+    const eased = easeOut(t);
+    const currentVal = fromVal + delta * eased;
+    
+    // Set the displayed value (without touching stats[stat].value which is already at final)
+    setDisplayedStatValue(stat, currentVal);
+    
+    if (t < 1) {
+      _statAnimations[stat].rafId = requestAnimationFrame(step);
+    } else {
+      // Ensure final value is exactly the target
+      setDisplayedStatValue(stat, toVal);
+      _statAnimations[stat] = null;
+      // Re-align carousel once at the end (in case active tile width changed)
+      reflowCarouselAfterAnimation();
+    }
+  };
+  
+  _statAnimations[stat] = { rafId: requestAnimationFrame(step) };
+}
+
+// Format a numeric value as if it were stats[stat] (uses the stat's format)
+function formatDisplayedValue(stat, val) {
+  const s = stats[stat];
+  switch (s.format) {
+    case 'money':
+      return '$' + val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    case 'int':
+      return Math.round(val).toLocaleString('en-US', { maximumFractionDigits: 0 });
+    case 'percent':
+      return val.toFixed(2) + '%';
+    default:
+      return String(val);
+  }
+}
+
+// Update the DOM with an arbitrary displayed value (used during animations)
+function setDisplayedStatValue(stat, val) {
+  const formatted = formatDisplayedValue(stat, val);
+  document.querySelectorAll(`.stats-track .stat-tile[data-stat="${stat}"] [data-num-edit]`).forEach(el => {
+    el.textContent = formatted;
+  });
+}
+
+// Called once at the end of all stat animations to re-align the carousel
+// (in case the active tile width changed because of longer numbers)
+function reflowCarouselAfterAnimation() {
+  if (typeof applyCarouselLayout === 'function') {
+    applyCarouselLayout(true); // animate the realignment if needed
+  }
 }
 
 // LocalStorage persistence
