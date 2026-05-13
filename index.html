@@ -43,7 +43,7 @@
   
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-    background: #fff;
+    background: var(--bg);
     color: var(--text);
     font-size: 15px;
     line-height: 1.4;
@@ -62,6 +62,18 @@
     background: var(--bg);
     position: relative;
     overflow: hidden;
+  }
+  /* Fade-out gradient at the bottom: hides content behind the floating tab-bar */
+  .app::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(80px + var(--safe-bottom));
+    background: linear-gradient(to bottom, rgba(246,246,247,0) 0%, rgba(246,246,247,0.85) 40%, rgba(246,246,247,1) 80%);
+    pointer-events: none;
+    z-index: 5;
   }
   
   /* Header noir */
@@ -198,6 +210,18 @@
     padding-top: 4px;
     touch-action: pan-y;
   }
+  /* Fade-out gradient on the right edge so dim tiles disappear softly */
+  .stats-row::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 50px;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
   .stats-track {
     display: flex;
     align-items: flex-start;
@@ -236,10 +260,24 @@
   /* Inactives = compactes, grisées progressivement */
   .stat-tile:not(.active) {
     min-width: 0;
+    padding-right: 20px;
   }
-  .stat-tile.dim-1 { opacity: 0.55; }
-  .stat-tile.dim-2 { opacity: 0.3; }
-  .stat-tile.dim-3 { opacity: 0.18; }
+  .stat-tile.dim-1 { opacity: 0.5; }
+  .stat-tile.dim-2 { opacity: 0.25; }
+  .stat-tile.dim-3 { opacity: 0.12; }
+  
+  /* Compact text sizes for dim tiles */
+  .stat-tile:not(.active) .label {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .stat-tile:not(.active) .value {
+    font-size: 19px;
+    font-weight: 600;
+  }
+  .stat-tile:not(.active) .change {
+    font-size: 12px;
+  }
   
   .stat-tile .label, .stat-tile .value, .stat-tile .change {
     transition: none;
@@ -399,7 +437,7 @@
     justify-content: center;
     flex-shrink: 0;
   }
-  .plus-card-img svg { width: 32px; height: 32px; }
+  .plus-card-img svg { width: 42px; height: 42px; }
   
   .trial-btn {
     margin: 12px;
@@ -1368,9 +1406,8 @@
       <div class="plus-banner-content">
         <div class="desc">Get access to two months of Plus-exclusive features like B2B, Audiences, and priority support at your current monthly platform fee.</div>
         <div class="plus-card-img">
-          <svg viewBox="0 0 500 142.8" xmlns="http://www.w3.org/2000/svg">
-            <path fill="#FFFFFF" d="M65,45.1l-4.3,16.1c0,0-4.8-2.2-10.5-1.8c-8.4,0.5-8.4,5.8-8.4,7.1c0.5,7.2,19.4,8.8,20.5,25.7c0.8,13.3-7,22.4-18.4,23.1C30.3,116,22.8,108,22.8,108l2.9-12.3c0,0,7.6,5.7,13.6,5.3c3.9-0.2,5.4-3.5,5.2-5.7c-0.6-9.4-16-8.8-17-24.3C26.7,58,35.2,44.9,54,43.7C61.3,43.2,65,45.1,65,45.1z" transform="translate(50, 0)"/>
-            <path fill="#FFFFFF" d="M107.4,27.1c-0.1-0.7-0.7-1.1-1.2-1.1c-0.5,0-10.4-0.2-10.4-0.2s-8.3-8-9.1-8.9c-0.8-0.8-2.4-0.6-3-0.4c0,0-1.6,0.5-4.2,1.3c-0.4-1.4-1.1-3.1-2-4.9c-2.9-5.6-7.3-8.6-12.5-8.6c-0.4,0-0.7,0-1.1,0.1c-0.2-0.2-0.3-0.4-0.5-0.5c-2.3-2.4-5.2-3.6-8.7-3.5c-6.7,0.2-13.4,5.1-18.9,13.7c-3.8,6.1-6.7,13.7-7.6,19.6c-7.7,2.4-13.1,4.1-13.3,4.1c-3.9,1.2-4,1.3-4.5,5C10.2,45.6,0,124.5,0,124.5l85.6,14.8l37.1-9.2C122.6,130.1,107.5,27.8,107.4,27.1z" transform="translate(50, 0)" opacity="0.3"/>
+          <svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#FFFFFF" d="M119 73c-7-4-11-7-11-12 0-6 5-9 13-9 9 0 17 4 17 4l6-19s-6-5-23-5c-24 0-41 14-41 33 0 11 8 19 18 25 8 5 11 8 11 13 0 5-4 9-12 9-11 0-22-6-22-6l-7 19s10 7 27 7c25 0 43-12 43-34 0-12-9-21-19-25z"/>
           </svg>
         </div>
       </div>
