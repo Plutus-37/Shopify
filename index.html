@@ -844,6 +844,384 @@
   .tile-icon-mute {
     color: #9ca3af;
   }
+  /* ===== Secondary pages (Orders, Customers, Reports, Discounts, Menu, Search) ===== */
+  .page-secondary {
+    padding-bottom: 80px;
+  }
+  .page-header {
+    background: white;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    gap: 8px;
+  }
+  .page-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    flex: 1;
+  }
+  .page-back-btn {
+    background: none;
+    border: none;
+    padding: 0 8px 0 0;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .page-back-btn svg {
+    width: 24px;
+    height: 24px;
+    display: block;
+  }
+  .page-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .page-icon-btn {
+    background: none;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .page-icon-btn:active { background: #f0f0f0; }
+  .page-icon-btn svg { width: 22px; height: 22px; }
+  
+  /* Search bar */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f1f1f3;
+    border-radius: 10px;
+    padding: 9px 12px;
+    margin-bottom: 12px;
+  }
+  .search-bar svg { width: 16px; height: 16px; color: var(--text-muted); flex-shrink: 0; }
+  .search-bar input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 15px;
+    color: var(--text);
+    font-family: inherit;
+  }
+  .search-bar input::placeholder { color: var(--text-muted); }
+  .search-bar.prominent { padding: 12px 14px; }
+  .search-bar.prominent svg { width: 18px; height: 18px; }
+  .search-bar.prominent input { font-size: 16px; }
+  .filter-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .filter-btn svg { width: 16px; height: 16px; }
+  
+  /* Segmented tabs (All / Unfulfilled / etc.) */
+  .seg-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+  .seg-tabs::-webkit-scrollbar { display: none; }
+  .seg-tab {
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: white;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .seg-tab.active {
+    background: #303030;
+    color: white;
+    border-color: #303030;
+  }
+  
+  /* Orders list */
+  .orders-list, .customers-list, .discounts-list {
+    background: white;
+  }
+  .order-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .order-row:active { background: #f9f9f9; }
+  .order-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid #c9cccf;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .order-info { flex: 1; min-width: 0; }
+  .order-line1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+  .order-num {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .order-amount {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .order-line2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .order-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .badge-paid { background: #e3f1df; color: #0c5132; }
+  .badge-unfulfilled { background: #fff1d6; color: #916a00; }
+  .badge-fulfilled { background: #e3f1df; color: #0c5132; }
+  
+  /* Empty states */
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text-muted);
+  }
+  .empty-state .empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .empty-state .empty-desc { font-size: 14px; }
+  
+  /* Customer rows */
+  .customer-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .customer-row:active { background: #f9f9f9; }
+  .customer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e1e3e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #6d7175;
+    flex-shrink: 0;
+  }
+  .customer-info { flex: 1; min-width: 0; }
+  .customer-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .customer-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .customer-spend {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  /* Discount rows */
+  .discount-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .discount-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #f1f1f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--text-muted);
+  }
+  .discount-icon svg { width: 18px; height: 18px; }
+  .discount-info { flex: 1; min-width: 0; }
+  .discount-code {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .discount-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .badge-active { background: #e3f1df; color: #0c5132; }
+  
+  /* Reports content */
+  .reports-content {
+    padding: 16px;
+  }
+  .report-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .report-card-title {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .report-card-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .report-card-change {
+    font-size: 13px;
+    color: var(--green-text);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .report-card-change svg { width: 12px; height: 12px; }
+  .report-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 18px 4px 8px;
+  }
+  
+  /* Menu content */
+  .menu-content {
+    background: white;
+  }
+  .menu-section {
+    border-bottom: 8px solid var(--bg);
+  }
+  .menu-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 16px 16px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    color: var(--text);
+  }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-item:active { background: #f9f9f9; }
+  .menu-item-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .menu-item-icon svg { width: 100%; height: 100%; }
+  .menu-item-label {
+    flex: 1;
+    font-size: 15px;
+  }
+  .menu-item-chevron {
+    color: var(--text-light);
+  }
+  .menu-item-chevron svg { width: 16px; height: 16px; }
+  
+  /* Search content */
+  .search-content { padding: 16px; }
+  .search-suggestions-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 8px;
+  }
+  .search-suggestion-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 4px;
+    cursor: pointer;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  .search-suggestion-row:active { background: #f9f9f9; }
+  .search-suggestion-row svg { width: 18px; height: 18px; color: var(--text-muted); flex-shrink: 0; }
+  .search-suggestion-label { font-size: 15px; flex: 1; }
 </style>
 </head>
 <body>
@@ -980,23 +1358,140 @@
     
   </div>
   
+  <!-- ORDERS PAGE -->
+  <div class="main page-secondary" id="orders-page" style="display:none;">
+    <div class="page-header">
+      <div class="page-title-row">
+        <h1 class="page-title">Orders</h1>
+        <div class="page-actions">
+          <button class="page-icon-btn" aria-label="Export">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button class="page-icon-btn" aria-label="Add">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search" id="orders-search">
+        <button class="filter-btn" aria-label="Filter">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        </button>
+      </div>
+      <div class="seg-tabs">
+        <div class="seg-tab active">All</div>
+        <div class="seg-tab">Unfulfilled</div>
+        <div class="seg-tab">Unpaid</div>
+        <div class="seg-tab">Open</div>
+      </div>
+    </div>
+    <div class="orders-list" id="orders-list"></div>
+  </div>
+  
+  <!-- CUSTOMERS PAGE (under Menu) -->
+  <div class="main page-secondary" id="customers-page" style="display:none;">
+    <div class="page-header">
+      <div class="page-title-row">
+        <button class="page-back-btn" data-back="menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h1 class="page-title">Customers</h1>
+        <div class="page-actions">
+          <button class="page-icon-btn" aria-label="Add">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search customers">
+      </div>
+    </div>
+    <div class="customers-list" id="customers-list"></div>
+  </div>
+  
+  <!-- REPORTS PAGE (under Menu) -->
+  <div class="main page-secondary" id="reports-page" style="display:none;">
+    <div class="page-header">
+      <div class="page-title-row">
+        <button class="page-back-btn" data-back="menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <h1 class="page-title">Analytics</h1>
+      </div>
+      <div class="seg-tabs">
+        <div class="seg-tab active">Today</div>
+        <div class="seg-tab">7d</div>
+        <div class="seg-tab">30d</div>
+        <div class="seg-tab">90d</div>
+      </div>
+    </div>
+    <div class="reports-content" id="reports-content"></div>
+  </div>
+  
+  <!-- DISCOUNTS PAGE -->
+  <div class="main page-secondary" id="discounts-page" style="display:none;">
+    <div class="page-header">
+      <div class="page-title-row">
+        <h1 class="page-title">Discounts</h1>
+        <div class="page-actions">
+          <button class="page-icon-btn" aria-label="Add">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search discounts">
+      </div>
+      <div class="seg-tabs">
+        <div class="seg-tab active">Active</div>
+        <div class="seg-tab">Scheduled</div>
+        <div class="seg-tab">Expired</div>
+      </div>
+    </div>
+    <div class="discounts-list" id="discounts-list"></div>
+  </div>
+  
+  <!-- MENU PAGE -->
+  <div class="main page-secondary" id="menu-page" style="display:none;">
+    <div class="page-header">
+      <div class="page-title-row">
+        <h1 class="page-title">Menu</h1>
+      </div>
+    </div>
+    <div class="menu-content" id="menu-content"></div>
+  </div>
+  
+  <!-- SEARCH PAGE -->
+  <div class="main page-secondary" id="search-page" style="display:none;">
+    <div class="page-header">
+      <div class="search-bar prominent">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search Lumen Studio" autofocus>
+      </div>
+    </div>
+    <div class="search-content" id="search-content"></div>
+  </div>
+  
   <div class="tab-bar">
-    <div class="tab-item">
+    <div class="tab-item" data-tab="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
     </div>
-    <div class="tab-item active">
+    <div class="tab-item active" data-tab="home">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
     </div>
-    <div class="tab-item">
+    <div class="tab-item" data-tab="orders">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
     </div>
-    <div class="tab-item">
+    <div class="tab-item" data-tab="discounts">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
     </div>
-    <div class="tab-item">
+    <div class="tab-item" data-tab="menu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </div>
-    <div class="tab-item">
+    <div class="tab-item" data-tab="me">
       <div class="me-circle">EL</div>
     </div>
   </div>
@@ -1655,14 +2150,426 @@ function applyCarouselLayout(animate = true) {
   document.addEventListener('mouseup', onEnd);
 })();
 
+// Load persisted state (stats + orderNum) before building UI
+loadState();
+
 // Init carousel
 buildCarouselTiles();
+
+// Sync settings inputs with loaded state when DOM is ready
+window.addEventListener('DOMContentLoaded', () => {
+  const orderInput = document.getElementById('input-order');
+  if (orderInput) orderInput.value = settings.orderNum;
+});
 
 // Apply initial layout after DOM ready
 window.addEventListener('load', () => {
   setTimeout(() => applyCarouselLayout(false), 50);
 });
 window.addEventListener('resize', () => applyCarouselLayout(false));
+
+// ============================================================
+// PAGE NAVIGATION (tab bar)
+// ============================================================
+
+const PAGES = {
+  home: 'main-page',
+  orders: 'orders-page',
+  customers: 'customers-page',
+  reports: 'reports-page',
+  discounts: 'discounts-page',
+  menu: 'menu-page',
+  search: 'search-page',
+  // 'me' tab opens settings sheet, doesn't change page
+};
+
+let currentPage = 'home';
+
+function navigateTo(page) {
+  if (page === 'me') {
+    // 'me' just opens settings sheet
+    if (typeof openSheet === 'function') openSheet();
+    return;
+  }
+  if (!PAGES[page]) return;
+  
+  // Hide all pages
+  Object.values(PAGES).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  
+  // Show target page
+  const target = document.getElementById(PAGES[page]);
+  if (target) target.style.display = '';
+  
+  // Update tab-bar active state (only for top-level pages)
+  document.querySelectorAll('.tab-item').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === page);
+  });
+  
+  currentPage = page;
+  
+  // Render the page content
+  if (page === 'orders') renderOrdersPage();
+  else if (page === 'customers') renderCustomersPage();
+  else if (page === 'reports') renderReportsPage();
+  else if (page === 'discounts') renderDiscountsPage();
+  else if (page === 'menu') renderMenuPage();
+  else if (page === 'search') renderSearchPage();
+  
+  // Scroll to top
+  if (target) target.scrollTop = 0;
+}
+
+// Wire up tab clicks
+document.querySelectorAll('.tab-item').forEach(t => {
+  t.addEventListener('click', () => {
+    const tab = t.dataset.tab;
+    if (tab) navigateTo(tab);
+  });
+});
+
+// Wire up back buttons (sub-pages → menu)
+document.querySelectorAll('.page-back-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const back = btn.dataset.back || 'menu';
+    navigateTo(back);
+  });
+});
+
+// ============================================================
+// HELPERS for page rendering
+// ============================================================
+
+function fmtMoney(n) {
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtRelativeTime(ts) {
+  const diff = (Date.now() - ts) / 1000; // seconds
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff / 60) + ' min ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + ' hr ago';
+  if (diff < 86400 * 7) return Math.floor(diff / 86400) + ' day' + (Math.floor(diff/86400) > 1 ? 's' : '') + ' ago';
+  // Otherwise show date like "Mar 18"
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// ============================================================
+// ORDERS PAGE
+// ============================================================
+
+function renderOrdersPage() {
+  const list = document.getElementById('orders-list');
+  if (!list) return;
+  const orders = loadOrderHistory();
+  
+  if (orders.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-title">No orders yet</div>
+        <div class="empty-desc">Orders will appear here as they come in.</div>
+      </div>`;
+    return;
+  }
+  
+  let html = '';
+  orders.forEach(o => {
+    // 70% paid+unfulfilled, 25% paid+fulfilled, 5% unpaid
+    const r = (o.orderNum * 7) % 100; // deterministic per order
+    let payment, fulfillment;
+    if (r < 5) { payment = 'Unpaid'; fulfillment = 'Unfulfilled'; }
+    else if (r < 75) { payment = 'Paid'; fulfillment = 'Unfulfilled'; }
+    else { payment = 'Paid'; fulfillment = 'Fulfilled'; }
+    
+    const payClass = payment === 'Paid' ? 'badge-paid' : 'badge-unfulfilled';
+    const fulfillClass = fulfillment === 'Fulfilled' ? 'badge-fulfilled' : 'badge-unfulfilled';
+    
+    html += `
+      <div class="order-row">
+        <div class="order-checkbox"></div>
+        <div class="order-info">
+          <div class="order-line1">
+            <span class="order-num">#${o.orderNum}</span>
+            <span class="order-amount">${fmtMoney(o.amount)}</span>
+          </div>
+          <div class="order-line2">
+            <div class="order-meta">
+              <span>Item × ${o.items}</span>
+              <span>·</span>
+              <span>${escapeHtml(o.channel)}</span>
+              <span>·</span>
+              <span>${fmtRelativeTime(o.timestamp)}</span>
+            </div>
+          </div>
+          <div class="order-line2" style="margin-top:6px;">
+            <span class="badge-pill ${payClass}">${payment}</span>
+            <span class="badge-pill ${fulfillClass}">${fulfillment}</span>
+          </div>
+        </div>
+      </div>`;
+  });
+  list.innerHTML = html;
+}
+
+// ============================================================
+// CUSTOMERS PAGE
+// ============================================================
+
+function renderCustomersPage() {
+  const list = document.getElementById('customers-list');
+  if (!list) return;
+  const orders = loadOrderHistory();
+  
+  if (orders.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-title">No customers yet</div>
+        <div class="empty-desc">Customers will appear here once you have orders.</div>
+      </div>`;
+    return;
+  }
+  
+  // Build a deterministic list of customers based on orders
+  // Each order has a "customer hash" derived from orderNum, and we group by hash
+  // to make total spend & order count consistent.
+  const customerMap = new Map();
+  orders.forEach(o => {
+    // Hash: 1 customer per ~3 orders (so we don't have 200 unique customers)
+    const hash = Math.floor(o.orderNum / 3) % 47; // 47 unique buckets
+    const id = 'C-' + hash.toString().padStart(4, '0');
+    if (!customerMap.has(id)) {
+      customerMap.set(id, { id, totalSpent: 0, orderCount: 0, lastOrderTs: 0 });
+    }
+    const c = customerMap.get(id);
+    c.totalSpent += o.amount;
+    c.orderCount += 1;
+    if (o.timestamp > c.lastOrderTs) c.lastOrderTs = o.timestamp;
+  });
+  
+  // Sort by last order desc
+  const customers = Array.from(customerMap.values()).sort((a, b) => b.lastOrderTs - a.lastOrderTs);
+  
+  let html = '';
+  customers.forEach(c => {
+    // Avatar = 2-letter ID like "C7", "B3" derived from id
+    const codes = c.id.replace('C-', '');
+    const avatar = String.fromCharCode(65 + (parseInt(codes) % 26)) + String.fromCharCode(65 + (parseInt(codes) * 7 % 26));
+    html += `
+      <div class="customer-row">
+        <div class="customer-avatar">${avatar}</div>
+        <div class="customer-info">
+          <div class="customer-name">Customer ${c.id}</div>
+          <div class="customer-meta">${c.orderCount} order${c.orderCount > 1 ? 's' : ''} · last ${fmtRelativeTime(c.lastOrderTs)}</div>
+        </div>
+        <div class="customer-spend">${fmtMoney(c.totalSpent)}</div>
+      </div>`;
+  });
+  list.innerHTML = html;
+}
+
+// ============================================================
+// REPORTS PAGE
+// ============================================================
+
+function renderReportsPage() {
+  const content = document.getElementById('reports-content');
+  if (!content) return;
+  
+  content.innerHTML = `
+    <div class="report-section-title">Sales</div>
+    <div class="report-card">
+      <div class="report-card-title">Total sales</div>
+      <div class="report-card-value">${fmtMoney(stats.totalSales.value)}</div>
+      <div class="report-card-change">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        ${stats.totalSales.change.toFixed(1)}% vs previous period
+      </div>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title">Orders</div>
+      <div class="report-card-value">${Math.floor(stats.orders.value).toLocaleString('en-US')}</div>
+      <div class="report-card-change">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        ${stats.orders.change.toFixed(1)}% vs previous period
+      </div>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title">Average order value</div>
+      <div class="report-card-value">${fmtMoney(stats.totalSales.value / Math.max(stats.orders.value, 1))}</div>
+    </div>
+    
+    <div class="report-section-title">Customers</div>
+    <div class="report-card">
+      <div class="report-card-title">Sessions</div>
+      <div class="report-card-value">${Math.floor(stats.sessions.value).toLocaleString('en-US')}</div>
+      <div class="report-card-change">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        ${stats.sessions.change.toFixed(1)}% vs previous period
+      </div>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title">Conversion rate</div>
+      <div class="report-card-value">${stats.conversion.value.toFixed(2)}%</div>
+      <div class="report-card-change">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        ${stats.conversion.change.toFixed(1)}% vs previous period
+      </div>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title">Returning customer rate</div>
+      <div class="report-card-value">34.2%</div>
+    </div>
+  `;
+}
+
+// ============================================================
+// DISCOUNTS PAGE
+// ============================================================
+
+function renderDiscountsPage() {
+  const list = document.getElementById('discounts-list');
+  if (!list) return;
+  
+  const discounts = [
+    { code: 'SUMMER25',    desc: '25% off · Order subtotal · 1,247 used', active: true },
+    { code: 'WELCOME10',   desc: '10% off · First order · 8,932 used',   active: true },
+    { code: 'FREESHIP',    desc: 'Free shipping · Min. $50 · 5,621 used', active: true },
+    { code: 'FLASH50',     desc: '$50 off · Min. $200 · 312 used',        active: true },
+    { code: 'BUNDLE3',     desc: 'Buy 3 get 1 free · 891 used',           active: true },
+    { code: 'VIP15',       desc: '15% off · Returning customers · 2,103 used', active: true },
+  ];
+  
+  let html = '';
+  discounts.forEach(d => {
+    html += `
+      <div class="discount-row">
+        <div class="discount-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        </div>
+        <div class="discount-info">
+          <div class="discount-code">${d.code}</div>
+          <div class="discount-desc">${d.desc}</div>
+        </div>
+        <span class="badge-pill badge-active">Active</span>
+      </div>`;
+  });
+  list.innerHTML = html;
+}
+
+// ============================================================
+// MENU PAGE
+// ============================================================
+
+function renderMenuPage() {
+  const content = document.getElementById('menu-content');
+  if (!content) return;
+  
+  const sections = [
+    {
+      title: 'Sales channels',
+      items: [
+        { label: 'Online Store', icon: 'M5 8h14M5 8a2 2 0 0 1-2-2V4h18v2a2 2 0 0 1-2 2M5 8v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M9 12h6' },
+        { label: 'Point of Sale', icon: 'M3 6h18l-2 13H5L3 6zM3 6L2 3H1' },
+      ]
+    },
+    {
+      title: 'Manage',
+      items: [
+        { label: 'Customers', icon: 'M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M8.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', tab: 'customers' },
+        { label: 'Products', icon: 'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16zM3.27 6.96l8.73 5.04 8.73-5.04M12 22.08V12' },
+        { label: 'Inventory', icon: 'M20 7h-4V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v4H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zM10 4h4v3h-4V4zm9 16H5V9h14v11z' },
+        { label: 'Locations', icon: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z' },
+      ]
+    },
+    {
+      title: 'Insights',
+      items: [
+        { label: 'Analytics', icon: 'M3 3v18h18 M7 14l4-4 4 4 5-5', tab: 'reports' },
+        { label: 'Marketing', icon: 'M3 11l18-8v18l-18-8v-2z' },
+      ]
+    },
+    {
+      title: 'Apps',
+      items: [
+        { label: 'Apps & themes', icon: 'M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z' },
+        { label: 'App store', icon: 'M12 2L2 7l10 5 10-5-10-5z M2 17l10 5 10-5 M2 12l10 5 10-5' },
+      ]
+    },
+    {
+      title: 'Settings',
+      items: [
+        { label: 'Store details', icon: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z' },
+        { label: 'Payments', icon: 'M21 4H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM1 10h22' },
+        { label: 'Shipping', icon: 'M16 3h5v5 M21 8l-7 7-4-4-7 7' },
+        { label: 'Notifications', icon: 'M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0' },
+      ]
+    },
+  ];
+  
+  let html = '';
+  sections.forEach(s => {
+    html += `<div class="menu-section">`;
+    html += `<div class="menu-section-title">${s.title}</div>`;
+    s.items.forEach(it => {
+      const tabAttr = it.tab ? `data-goto="${it.tab}"` : '';
+      html += `
+        <div class="menu-item" ${tabAttr}>
+          <div class="menu-item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${it.icon}"/></svg>
+          </div>
+          <div class="menu-item-label">${it.label}</div>
+          <div class="menu-item-chevron">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  });
+  content.innerHTML = html;
+  
+  // Wire up navigation in menu (Customers, Analytics)
+  content.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', () => {
+      const tab = el.dataset.goto;
+      if (tab) navigateTo(tab);
+    });
+  });
+}
+
+// ============================================================
+// SEARCH PAGE
+// ============================================================
+
+function renderSearchPage() {
+  const content = document.getElementById('search-content');
+  if (!content) return;
+  
+  const suggestions = [
+    { label: 'Recent orders', tab: 'orders' },
+    { label: 'Customers', tab: 'customers' },
+    { label: 'Products', tab: null },
+    { label: 'Discounts', tab: 'discounts' },
+    { label: 'Analytics', tab: 'reports' },
+  ];
+  
+  let html = `<div class="search-suggestions-title">Suggestions</div>`;
+  suggestions.forEach(s => {
+    const tabAttr = s.tab ? `data-goto="${s.tab}"` : '';
+    html += `
+      <div class="search-suggestion-row" ${tabAttr}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <div class="search-suggestion-label">${s.label}</div>
+      </div>`;
+  });
+  content.innerHTML = html;
+  
+  content.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', () => navigateTo(el.dataset.goto));
+  });
+}
 
 // ============================================================
 // NUMBER EDIT MODAL
@@ -1712,6 +2619,9 @@ function commitEdit() {
     
     updateStatsDisplay();
     renderChart(true);
+    
+    // Persist after manual edit
+    saveState();
   }
   numOverlay.style.display = 'none';
   editingStat = null;
@@ -1939,14 +2849,96 @@ function buildNotifData() {
   const channel = channels[Math.floor(Math.random() * channels.length)];
   
   return {
+    orderNum: settings.orderNum,
+    amount: amount,
+    items: items,
+    channel: channel,
+    timestamp: Date.now(),
     title: 'Order #' + settings.orderNum + ' from Shopify',
     body: '$' + amount.toFixed(2) + ', ' + items + ' item' + (items > 1 ? 's' : '') + ' from ' + channel + ' · ' + settings.storeName,
   };
 }
 
+// Increment stats based on a new order, with smooth animation
+function incrementStatsWithOrder(orderData) {
+  // Total sales
+  stats.totalSales.value += orderData.amount;
+  // Orders count
+  stats.orders.value += 1;
+  // Sessions: random 1-3 new sessions per order (realistic)
+  stats.sessions.value += Math.floor(Math.random() * 3) + 1;
+  // Conversion: orders/sessions * 100
+  stats.conversion.value = (stats.orders.value / stats.sessions.value) * 100;
+  
+  // Refresh display
+  updateAllTilesDisplay();
+  
+  // Persist
+  saveState();
+  
+  // Add this order to history
+  addOrderToHistory(orderData);
+}
+
+// LocalStorage persistence
+const STORAGE_KEY = 'lumen_studio_state_v1';
+const ORDERS_KEY = 'lumen_studio_orders_v1';
+const MAX_ORDERS_STORED = 200; // keep last 200 orders
+
+function saveState() {
+  try {
+    const state = {
+      stats: {
+        totalSales: stats.totalSales.value,
+        orders: stats.orders.value,
+        conversion: stats.conversion.value,
+        sessions: stats.sessions.value,
+      },
+      orderNum: settings.orderNum,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) { /* ignore */ }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    if (state.stats) {
+      if (typeof state.stats.totalSales === 'number') stats.totalSales.value = state.stats.totalSales;
+      if (typeof state.stats.orders === 'number') stats.orders.value = state.stats.orders;
+      if (typeof state.stats.conversion === 'number') stats.conversion.value = state.stats.conversion;
+      if (typeof state.stats.sessions === 'number') stats.sessions.value = state.stats.sessions;
+    }
+    if (typeof state.orderNum === 'number') settings.orderNum = state.orderNum;
+  } catch (e) { /* ignore */ }
+}
+
+function addOrderToHistory(orderData) {
+  try {
+    const raw = localStorage.getItem(ORDERS_KEY);
+    const orders = raw ? JSON.parse(raw) : [];
+    orders.unshift(orderData); // newest first
+    // Cap to MAX_ORDERS_STORED
+    if (orders.length > MAX_ORDERS_STORED) orders.length = MAX_ORDERS_STORED;
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  } catch (e) { /* ignore */ }
+}
+
+function loadOrderHistory() {
+  try {
+    const raw = localStorage.getItem(ORDERS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) { return []; }
+}
+
 async function fireNotification() {
   if (!settings.push) return;
   const data = buildNotifData();
+  
+  // Increment stats live (Total sales +amount, Orders +1, etc.) and persist
+  incrementStatsWithOrder(data);
   
   // Check real notification permission
   const perm = await ensureNotifPermission();
