@@ -1,0 +1,1872 @@
+<title>Sprint Code de la route</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@500;600;700&display=swap">
+<style>
+/* Layout : colonne centrale 920px, cartes sombres, accents vert (réussite) et bleu (progression). */
+:root {
+  color-scheme: dark;
+  --bg: #0c1416;
+  --surface: #131f22;
+  --surface-2: #1a292d;
+  --line: #24383d;
+  --fg: #e6efec;
+  --muted: #8fa7a2;
+  --green: #3ddc97;
+  --green-ink: #06281b;
+  --blue: #5aa9ff;
+  --red: #ff6b6b;
+  --amber: #f5b947;
+  --font-display: "Sora", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-num: "JetBrains Mono", ui-monospace, monospace;
+  --radius: 16px;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); }
+body { font-family: var(--font-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+button { font: inherit; color: inherit; }
+h2 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+p { margin: 0; }
+.app { max-width: 920px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 40px; }
+.muted { color: var(--muted); }
+.small { font-size: 0.84rem; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.stack { display: grid; gap: 16px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.two > * { min-width: 0; }
+
+/* En-tête */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 0; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 1.1rem; letter-spacing: -0.02em; white-space: nowrap; }
+.brand b { color: var(--green); font-weight: 700; }
+.logo { width: 26px; height: 26px; color: var(--green); display: inline-flex; }
+nav { display: flex; gap: 4px; overflow-x: auto; flex: 1; scrollbar-width: none; }
+.nav { background: none; border: 0; padding: 8px 12px; border-radius: 10px; color: var(--muted); cursor: pointer; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.nav:hover { color: var(--fg); background: var(--surface); }
+.nav.on { color: var(--fg); background: var(--surface-2); }
+.nav:focus-visible, .btn:focus-visible, .opt:focus-visible, .check:focus-visible, .mode:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.badge { background: var(--red); color: #fff; font-size: 0.72rem; border-radius: 999px; padding: 0 6px; font-weight: 700; }
+.sync-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--muted); }
+.s-synced .dot, .sync-dot.s-synced { background: var(--green); }
+.s-saving .dot, .sync-dot.s-saving, .s-connecting .dot, .sync-dot.s-connecting { background: var(--blue); }
+.s-error .dot, .sync-dot.s-error, .s-full .dot, .sync-dot.s-full { background: var(--red); }
+.s-local .dot, .sync-dot.s-local { background: var(--amber); }
+
+/* Cartes et boutons */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: grid; gap: 12px; align-content: start; }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.btn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 11px 18px; cursor: pointer; font-weight: 600; transition: transform .12s ease, background .12s ease; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.primary { background: var(--green); color: var(--green-ink); border-color: var(--green); }
+.btn.ghost { background: transparent; }
+.btn.ghost:hover:not(:disabled) { background: var(--surface-2); }
+.btn.danger { background: var(--red); color: #2a0707; border-color: var(--red); }
+.btn.sm { padding: 7px 12px; font-size: 0.86rem; border-radius: 10px; }
+.row-btns { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.pill { display: inline-block; font-size: 0.74rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; font-family: var(--font-num); }
+.pill-ok { background: color-mix(in srgb, var(--green) 20%, transparent); color: var(--green); }
+.pill-bad { background: color-mix(in srgb, var(--red) 20%, transparent); color: var(--red); }
+.pill-hard { background: color-mix(in srgb, var(--amber) 18%, transparent); color: var(--amber); font-family: var(--font-body); }
+.eyebrow { font-size: 0.74rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+.notice { background: color-mix(in srgb, var(--blue) 14%, var(--surface)); border: 1px solid color-mix(in srgb, var(--blue) 40%, transparent); padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; }
+
+/* Barres */
+.bar { position: relative; height: 8px; border-radius: 99px; background: var(--surface-2); overflow: visible; }
+.bar-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
+.bar-fill.green { background: var(--green); }
+.bar-fill.blue { background: var(--blue); }
+.bar-fill.red { background: var(--red); }
+.bar-marker { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--fg); border-radius: 2px; }
+
+/* Tableau de bord */
+.resume { grid-template-columns: 1fr auto; align-items: center; border-color: color-mix(in srgb, var(--blue) 50%, var(--line)); }
+.hero { grid-template-columns: 1.4fr 1fr; gap: 24px; background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--blue) 8%, var(--surface)) 100%); }
+.hero-score, .hero-next { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.hero-next { border-left: 1px solid var(--line); padding-left: 24px; }
+.hero-next .btn { justify-self: start; }
+.big { font-family: var(--font-display); font-size: 3.4rem; font-weight: 700; line-height: 1; letter-spacing: -0.03em; }
+.big small { font-size: 1.3rem; color: var(--muted); font-weight: 500; margin-left: 4px; }
+.ok { color: var(--green); } .warn { color: var(--amber); } .good { color: var(--green); } .bad { color: var(--red); }
+.gauge { display: grid; gap: 4px; margin-top: 4px; }
+.gauge-labels { position: relative; height: 16px; font-size: 0.72rem; color: var(--muted); font-family: var(--font-num); }
+.gauge-labels span { position: absolute; transform: translateX(-50%); }
+.gauge-labels span:nth-child(1) { left: 0; transform: none; }
+.gauge-labels span:nth-child(2) { left: 87.5%; }
+.gauge-labels span:nth-child(3) { right: 0; transform: none; }
+.next-title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; }
+.prio { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.prio li { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; background: var(--surface-2); border-radius: 12px; }
+.prio-body { min-width: 0; }
+.prio-name { font-weight: 600; }
+.rank { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-num); font-weight: 700; background: color-mix(in srgb, var(--red) 22%, transparent); color: var(--red); }
+.prio li:nth-child(2) .rank { background: color-mix(in srgb, var(--amber) 22%, transparent); color: var(--amber); }
+.prio li:nth-child(3) .rank { background: color-mix(in srgb, var(--blue) 22%, transparent); color: var(--blue); }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.kpi { gap: 2px; padding: 14px 16px; }
+.kpi-v { font-family: var(--font-num); font-size: 1.6rem; font-weight: 600; }
+.kpi-v small { font-size: 0.9rem; color: var(--muted); }
+.kpi-l { color: var(--muted); font-size: 0.82rem; }
+.themes { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px; }
+.theme { display: grid; gap: 5px; min-width: 0; }
+.theme-top { display: flex; justify-content: space-between; gap: 8px; font-size: 0.9rem; }
+.exams { display: flex; gap: 10px; align-items: flex-end; height: 130px; }
+.exam-col { flex: 1; max-width: 46px; display: grid; gap: 4px; justify-items: center; height: 100%; grid-template-rows: 1fr auto; }
+.exam-bar-wrap { position: relative; width: 100%; height: 100%; background: var(--surface-2); border-radius: 8px; overflow: hidden; display: flex; align-items: flex-end; }
+.exam-bar { width: 100%; border-radius: 8px 8px 0 0; }
+.exam-bar.pass { background: var(--green); } .exam-bar.fail { background: var(--amber); }
+.exam-line { position: absolute; left: 0; right: 0; bottom: 87.5%; height: 2px; background: var(--fg); opacity: .7; }
+.rec { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.rec li { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; }
+.memo-inline { color: var(--green); font-size: 0.82rem; margin-top: 2px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--muted); font-weight: 500; }
+.r { text-align: right; }
+
+/* Sprint */
+.switch { display: flex; gap: 10px; align-items: center; cursor: pointer; font-size: 0.9rem; }
+.switch input { width: 18px; height: 18px; accent-color: var(--green); }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.steps li { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid transparent; }
+.steps li.next { border-color: var(--green); }
+.steps li.done .step-title { color: var(--muted); text-decoration: line-through; }
+.step-body { min-width: 0; }
+.step-title { font-weight: 600; }
+.check { width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--line); background: transparent; cursor: pointer; font-weight: 800; color: var(--green-ink); display: grid; place-items: center; }
+.steps li.done .check { background: var(--green); border-color: var(--green); }
+
+/* Modes */
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.mode { text-align: left; cursor: pointer; transition: border-color .15s ease, transform .15s ease; }
+.mode:hover:not(:disabled) { border-color: var(--green); transform: translateY(-2px); }
+.mode:disabled { opacity: .55; cursor: not-allowed; }
+.mode-n { font-family: var(--font-num); font-size: 0.75rem; color: var(--blue); }
+.mode-name { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; }
+
+/* Quiz */
+.quiz { display: grid; gap: 14px; max-width: 760px; margin: 0 auto; }
+.quiz-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.quiz-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.mode-tag { font-weight: 600; color: var(--blue); }
+.timers { display: flex; gap: 8px; }
+.timer { font-family: var(--font-num); font-size: 0.85rem; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); }
+.timer.late { background: color-mix(in srgb, var(--red) 25%, transparent); color: var(--red); }
+.qcard { animation: rise .25s ease; }
+@keyframes rise { from { transform: translateY(6px); opacity: .6; } to { transform: none; opacity: 1; } }
+.q-head { display: flex; gap: 8px; align-items: center; }
+.cat { font-size: 0.75rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+.q-text { font-family: var(--font-body); font-size: 1.12rem; font-weight: 600; line-height: 1.45; letter-spacing: 0; }
+.hint { margin-top: -4px; }
+.scene { margin: 0; display: grid; gap: 4px; }
+.scene > div { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); max-width: 520px; }
+.scene svg { display: block; width: 100%; height: auto; }
+.scene figcaption { font-size: 0.72rem; color: var(--muted); }
+.opts { display: grid; gap: 8px; }
+.opt { display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: center; text-align: left; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface-2); cursor: pointer; transition: border-color .12s ease, background .12s ease; min-height: 52px; }
+.opt:hover { border-color: color-mix(in srgb, var(--blue) 60%, var(--line)); }
+.opt .letter, .corr-opts .letter { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; font-family: var(--font-num); font-weight: 700; background: var(--bg); }
+.opt.sel { border-color: var(--blue); background: color-mix(in srgb, var(--blue) 14%, var(--surface-2)); }
+.opt.sel .letter { background: var(--blue); color: #04192e; }
+.opt.good { border-color: var(--green); background: color-mix(in srgb, var(--green) 13%, var(--surface-2)); }
+.opt.good .letter { background: var(--green); color: var(--green-ink); }
+.opt.bad { border-color: var(--red); background: color-mix(in srgb, var(--red) 13%, var(--surface-2)); }
+.opt.bad .letter { background: var(--red); color: #2a0707; }
+.opt-text { min-width: 0; }
+.feedback { display: grid; gap: 8px; padding: 14px; border-radius: 12px; border: 1px solid; }
+.fb-ok { border-color: color-mix(in srgb, var(--green) 50%, transparent); background: color-mix(in srgb, var(--green) 7%, var(--surface)); }
+.fb-bad { border-color: color-mix(in srgb, var(--red) 50%, transparent); background: color-mix(in srgb, var(--red) 7%, var(--surface)); }
+.fb-title { font-family: var(--font-display); font-weight: 600; }
+.fb-ok .fb-title { color: var(--green); } .fb-bad .fb-title { color: var(--red); }
+.trap { color: var(--amber); }
+.trap strong { color: var(--amber); }
+.memo { font-weight: 600; padding: 8px 12px; border-left: 3px solid var(--green); background: var(--bg); border-radius: 0 8px 8px 0; }
+.quiz-actions { display: flex; justify-content: space-between; gap: 10px; position: sticky; bottom: 0; padding-block: 12px calc(12px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--bg) 70%, transparent); }
+.quiz-actions .btn.primary { min-width: 150px; }
+
+/* Bilan */
+.hero-res { justify-items: start; }
+.verdict { font-weight: 700; }
+.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.plain li { display: flex; justify-content: space-between; gap: 10px; }
+.rules { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.corr { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; background: var(--surface-2); }
+.corr[open] { display: grid; gap: 8px; }
+.corr summary { cursor: pointer; font-weight: 500; }
+.corr-opts { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.corr-opts li { display: flex; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 8px; }
+.corr-opts li.good { background: color-mix(in srgb, var(--green) 15%, transparent); }
+.corr-opts li.bad { background: color-mix(in srgb, var(--red) 15%, transparent); }
+.c-bad { border-color: color-mix(in srgb, var(--red) 35%, var(--line)); }
+
+/* Données */
+.sync-box { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 12px; background: var(--surface-2); }
+.sync-box .dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; flex: none; }
+.report { white-space: pre-wrap; font-family: var(--font-num); font-size: 0.78rem; background: var(--bg); padding: 12px; border-radius: 10px; max-height: 240px; overflow: auto; margin: 0; border: 1px solid var(--line); }
+textarea { width: 100%; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-family: var(--font-num); font-size: 0.8rem; }
+.file { position: relative; overflow: hidden; }
+.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+.foot { text-align: center; margin-top: 28px; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--surface-2); border: 1px solid var(--line); padding: 10px 16px; border-radius: 12px; z-index: 20; max-width: calc(100% - 32px); }
+
+@media (max-width: 720px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-next { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 16px; }
+  .two, .themes { grid-template-columns: 1fr; }
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .brand span:last-child { display: none; }
+  .big { font-size: 2.8rem; }
+  .card { padding: 15px; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+</style>
+<div id="root"><p style="padding:24px;color:#8fa7a2;font-family:sans-serif">Chargement de l'application…</p></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script>
+// Banque de questions originales — Code de la route français (règles en vigueur fin 2026).
+// Format : id, c (catégorie), d (difficulté 1-3), q (énoncé), o (propositions), a (index des bonnes réponses),
+// e (explication), t (piège, optionnel), m (phrase à mémoriser), r (référence, optionnel), img (scène SVG, optionnel).
+
+window.CATS = {
+  LEG: { name: "Dispositions légales", short: "Légal", prior: 2 },
+  CON: { name: "Le conducteur", short: "Conducteur", prior: 1 },
+  CIR: { name: "La route : circulation et priorités", short: "Circulation", prior: 1 },
+  QUI: { name: "Arrêt, stationnement, quitter le véhicule", short: "Quitter véhicule", prior: 1 },
+  USA: { name: "Les autres usagers", short: "Usagers", prior: 1 },
+  EQU: { name: "Équipements de sécurité", short: "Équipements", prior: 1 },
+  SIG: { name: "Signalisation et situations complexes", short: "Signalisation", prior: 0.5 },
+  SEC: { name: "Accident et premiers secours", short: "Secours", prior: 0.3 },
+};
+
+const OUI_NON = ["Oui", "Non"];
+
+window.QUESTIONS = [
+  // ───────────── DISPOSITIONS LÉGALES ─────────────
+  { id: "LEG-01", c: "LEG", d: 1, q: "Je viens d'obtenir mon permis par la filière classique. Combien de points compte mon permis probatoire au départ ?",
+    o: ["6 points", "8 points", "12 points"], a: [0],
+    e: "Le permis probatoire démarre à 6 points. Sans infraction, il atteint 12 points à la fin de la période probatoire.",
+    m: "Probatoire = 6 points au départ, 12 à la fin.", r: "Code de la route, art. L223-1" },
+  { id: "LEG-02", c: "LEG", d: 2, q: "J'ai obtenu mon permis après un apprentissage anticipé de la conduite (AAC). Sans infraction, combien de temps dure ma période probatoire ?",
+    o: ["1 an", "2 ans", "3 ans"], a: [1],
+    e: "Avec l'AAC, la période probatoire dure 2 ans (+3 points par an). En filière classique, elle dure 3 ans (+2 points par an).",
+    t: "Ne confonds pas : 3 ans = filière classique, 2 ans = conduite accompagnée.",
+    m: "AAC = 2 ans ; classique = 3 ans." },
+  { id: "LEG-03", c: "LEG", d: 1, q: "Je suis en permis probatoire. Quel est le taux d'alcool maximal autorisé dans le sang ?",
+    o: ["0,2 g/l", "0,5 g/l", "0,8 g/l"], a: [0],
+    e: "En période probatoire, la limite est de 0,2 g/l de sang (0,10 mg/l d'air expiré), ce qui revient en pratique à zéro verre.",
+    m: "Jeune conducteur = 0,2 g/l = zéro verre.", r: "Code de la route, art. R234-1" },
+  { id: "LEG-04", c: "LEG", d: 2, q: "Je suis titulaire d'un permis définitif. Quel est le taux maximal autorisé dans l'air expiré ?",
+    o: ["0,10 mg/l", "0,25 mg/l", "0,40 mg/l"], a: [1],
+    e: "0,5 g/l de sang correspond à 0,25 mg/l d'air expiré. 0,10 mg/l est la limite probatoire ; 0,40 mg/l est le seuil du délit.",
+    t: "Sang ÷ 2 = air expiré.", m: "0,5 g/l sang = 0,25 mg/l air.", r: "Code de la route, art. R234-1" },
+  { id: "LEG-05", c: "LEG", d: 2, q: "À partir de quel taux d'alcool dans le sang la conduite devient-elle un délit ?",
+    o: ["0,5 g/l", "0,8 g/l", "1,2 g/l"], a: [1],
+    e: "Entre 0,5 et 0,8 g/l (permis définitif), c'est une contravention. À partir de 0,8 g/l de sang (0,40 mg/l d'air), c'est un délit jugé au tribunal.",
+    m: "0,8 g/l = délit.", r: "Code de la route, art. L234-1" },
+  { id: "LEG-06", c: "LEG", d: 1, q: "Je téléphone en tenant mon téléphone en main pendant que je conduis. Combien de points vais-je perdre ?",
+    o: ["1 point", "3 points", "4 points", "6 points"], a: [1],
+    e: "Téléphone tenu en main : 3 points et 135 € d'amende forfaitaire.",
+    m: "Téléphone en main = 3 points.", r: "Code de la route, art. R412-6-1" },
+  { id: "LEG-07", c: "LEG", d: 2, q: "Je téléphone en conduisant avec une oreillette Bluetooth, sans tenir le téléphone. Est-ce autorisé ?",
+    o: OUI_NON, a: [1],
+    e: "Tout dispositif porté à l'oreille et susceptible d'émettre du son est interdit au volant : oreillette, écouteurs, casque.",
+    t: "Ne pas tenir le téléphone ne suffit pas : c'est l'objet porté à l'oreille qui est interdit.",
+    m: "Rien dans les oreilles au volant.", r: "Code de la route, art. R412-6-1" },
+  { id: "LEG-08", c: "LEG", d: 2, q: "Je téléphone grâce au système Bluetooth intégré à la voiture, le son sortant des haut-parleurs. Est-ce autorisé ?",
+    o: OUI_NON, a: [0],
+    e: "Le kit main libre intégré au véhicule (haut-parleurs) reste autorisé, même s'il est déconseillé car il réduit l'attention.",
+    t: "Différence avec l'oreillette : ici, rien n'est porté à l'oreille.",
+    m: "Haut-parleurs du véhicule : autorisé. Oreillette : interdit." },
+  { id: "LEG-09", c: "LEG", d: 3, q: "En agglomération (limite 50 km/h), je suis contrôlé à une vitesse retenue de 54 km/h. Combien de points vais-je perdre ?",
+    o: ["0 point", "1 point", "2 points"], a: [0],
+    e: "Depuis le 1er janvier 2024, un excès de vitesse inférieur à 5 km/h n'entraîne plus de retrait de point. L'amende reste due.",
+    t: "Pas de point retiré ne veut pas dire pas d'amende.",
+    m: "Excès < 5 km/h : amende, mais 0 point." },
+  { id: "LEG-10", c: "LEG", d: 2, q: "Je dépasse la vitesse autorisée de 35 km/h. Combien de points vais-je perdre ?",
+    o: ["2 points", "3 points", "4 points", "6 points"], a: [1],
+    e: "Barème : < 20 km/h = 1 point (si ≥ 5 km/h) ; 20 à 29 = 2 points ; 30 à 39 = 3 points ; 40 à 49 = 4 points ; 50 et plus = 6 points.",
+    m: "30 à 39 km/h de trop = 3 points." },
+  { id: "LEG-11", c: "LEG", d: 2, q: "Je ne cède pas le passage à un piéton qui traverse régulièrement. Combien de points vais-je perdre ?",
+    o: ["3 points", "4 points", "6 points"], a: [2],
+    e: "Le refus de priorité à un piéton coûte 6 points et 135 € d'amende forfaitaire.",
+    t: "Plus sévère qu'un feu rouge (4 points).", m: "Piéton non respecté = 6 points." },
+  { id: "LEG-12", c: "LEG", d: 1, q: "Je franchis un feu rouge. Combien de points vais-je perdre ?",
+    o: ["2 points", "3 points", "4 points"], a: [2],
+    e: "Feu rouge ou stop non respecté : 4 points et 135 €.", m: "Feu rouge = stop = 4 points." },
+  { id: "LEG-13", c: "LEG", d: 2, q: "J'ai perdu un seul point. Si je ne commets aucune nouvelle infraction, au bout de combien de temps vais-je le récupérer ?",
+    o: ["6 mois", "1 an", "2 ans"], a: [0],
+    e: "Un point retiré pour une infraction à 1 point est restitué après 6 mois sans nouvelle infraction.",
+    m: "1 point perdu = récupéré en 6 mois." },
+  { id: "LEG-14", c: "LEG", d: 2, q: "Lors d'un contrôle routier, quels documents dois-je pouvoir présenter ?",
+    o: ["Mon permis de conduire", "Le certificat d'immatriculation du véhicule", "La facture d'achat du véhicule"], a: [0, 1],
+    e: "Le permis et le certificat d'immatriculation (carte grise) doivent pouvoir être présentés. La facture d'achat n'est jamais exigée.",
+    m: "Contrôle = permis + carte grise." },
+  { id: "LEG-15", c: "LEG", d: 3, q: "Depuis avril 2024, dois-je apposer une vignette d'assurance (carte verte) sur mon pare-brise ?",
+    o: OUI_NON, a: [1],
+    e: "Depuis le 1er avril 2024, la vignette verte n'est plus à apposer : les forces de l'ordre vérifient l'assurance dans le fichier des véhicules assurés. Rouler assuré reste obligatoire.",
+    t: "L'assurance reste obligatoire, seule la vignette a disparu.", m: "Plus de vignette verte, mais assurance toujours obligatoire." },
+  { id: "LEG-16", c: "LEG", d: 1, q: "Ma voiture est neuve. Je dois réaliser son premier contrôle technique avant :",
+    o: ["2 ans", "4 ans", "5 ans"], a: [1],
+    e: "Pour une voiture particulière, le premier contrôle technique a lieu dans les 6 mois précédant le 4e anniversaire de la première immatriculation, puis tous les 2 ans.",
+    m: "CT : 4 ans, puis tous les 2 ans." },
+  { id: "LEG-17", c: "LEG", d: 2, q: "Je déménage. Dans quel délai dois-je modifier l'adresse de mon certificat d'immatriculation ?",
+    o: ["15 jours", "1 mois", "3 mois"], a: [1],
+    e: "Le changement d'adresse doit être déclaré dans le mois qui suit le déménagement.", m: "Déménagement : 1 mois pour la carte grise." },
+  { id: "LEG-18", c: "LEG", d: 2, q: "Je suis en permis probatoire et je commets une infraction qui me retire 3 points. Dois-je suivre un stage de sensibilisation ?",
+    o: ["Oui, il est obligatoire", "Non, il est seulement conseillé"], a: [0],
+    e: "En probatoire, une infraction entraînant un retrait d'au moins 3 points rend le stage obligatoire (lettre 48N), dans un délai de 4 mois.",
+    m: "Probatoire + 3 points perdus = stage obligatoire." },
+  { id: "LEG-19", c: "LEG", d: 2, q: "Mon passager de 16 ans n'a pas attaché sa ceinture. Qui est sanctionné ?",
+    o: ["Le passager", "Moi, le conducteur", "Personne, il a plus de 13 ans"], a: [1],
+    e: "Le conducteur est responsable du port de la ceinture (ou du système de retenue) des passagers mineurs.",
+    t: "Pour un passager majeur, c'est le passager lui-même qui est sanctionné.",
+    m: "Mineur non attaché = conducteur sanctionné." },
+  { id: "LEG-20", c: "LEG", d: 2, q: "Mon passager de 25 ans n'a pas attaché sa ceinture. Qui est sanctionné ?",
+    o: ["Le passager", "Moi, le conducteur"], a: [0],
+    e: "Un passager majeur est personnellement responsable du port de sa ceinture.",
+    t: "Variante de la question du passager mineur : l'âge change la réponse.", m: "Majeur = il paie ; mineur = je paie." },
+  { id: "LEG-21", c: "LEG", d: 2, q: "Conduire après avoir consommé du cannabis (test positif) entraîne un retrait de :",
+    o: ["3 points", "4 points", "6 points"], a: [2],
+    e: "La conduite après usage de stupéfiants est un délit : retrait de 6 points, amende, suspension ou annulation possible du permis.",
+    m: "Stupéfiants = délit = 6 points." },
+  { id: "LEG-22", c: "LEG", d: 3, q: "Je tiens mon téléphone en main ET je commets en même temps un excès de vitesse. Les forces de l'ordre peuvent-elles retenir immédiatement mon permis ?",
+    o: OUI_NON, a: [0],
+    e: "Depuis 2020, l'usage du téléphone tenu en main combiné à certaines autres infractions (vitesse, priorité, feu...) permet la rétention immédiate du permis.",
+    m: "Téléphone + autre infraction = rétention possible du permis." },
+  { id: "LEG-23", c: "LEG", d: 1, q: "Pendant ma période probatoire, je dois apposer le disque « A » à l'arrière de mon véhicule. Est-ce obligatoire ?",
+    o: OUI_NON, a: [0],
+    e: "Le signe distinctif « A » est obligatoire pendant toute la période probatoire.", m: "Probatoire = disque A obligatoire." },
+
+  // ───────────── LE CONDUCTEUR ─────────────
+  { id: "CON-01", c: "CON", d: 1, q: "En moyenne, quel est le temps de réaction d'un conducteur attentif ?",
+    o: ["0,1 seconde", "1 seconde", "3 secondes"], a: [1],
+    e: "On retient 1 seconde pour un conducteur en bonne forme. Il augmente avec la fatigue, l'alcool, le téléphone ou les médicaments.",
+    m: "Temps de réaction ≈ 1 seconde." },
+  { id: "CON-02", c: "CON", d: 2, q: "Je roule à 90 km/h. Environ quelle distance je parcours pendant 1 seconde de réaction ?",
+    o: ["9 m", "25 m", "50 m"], a: [1],
+    e: "90 km/h = 25 m par seconde (90 ÷ 3,6). Pendant la seule seconde de réaction, la voiture parcourt donc environ 25 m sans freiner.",
+    t: "Calcul rapide : chiffre des dizaines × 3 ≈ distance en 1 s (9 × 3 = 27 m).", m: "Distance en 1 s ≈ dizaines × 3." },
+  { id: "CON-03", c: "CON", d: 2, q: "Si ma vitesse double, ma distance de freinage est multipliée par :",
+    o: ["2", "3", "4"], a: [2],
+    e: "La distance de freinage augmente avec le carré de la vitesse : 2 fois plus vite = 4 fois plus de distance. Même chose pour l'énergie d'un choc.",
+    m: "Vitesse × 2 = freinage × 4." },
+  { id: "CON-04", c: "CON", d: 1, q: "Sur route mouillée, ma distance de freinage :",
+    o: ["Reste la même", "Augmente", "Diminue grâce à l'ABS"], a: [1],
+    e: "L'adhérence diminue sur chaussée mouillée : la distance de freinage augmente nettement. Il faut réduire sa vitesse et augmenter les distances.",
+    m: "Pluie = freinage plus long." },
+  { id: "CON-05", c: "CON", d: 1, q: "Sur un long trajet, il est recommandé de faire une pause :",
+    o: ["Toutes les 2 heures", "Toutes les 4 heures", "Seulement en cas de fatigue"], a: [0],
+    e: "Une pause d'environ 15 à 20 minutes toutes les 2 heures est recommandée, même sans fatigue ressentie.", m: "Pause toutes les 2 heures." },
+  { id: "CON-06", c: "CON", d: 2, q: "Quels signes indiquent un risque de somnolence au volant ?",
+    o: ["Bâillements répétés", "Picotements des yeux", "Raideur de la nuque", "Envie de rouler plus vite"], a: [0, 1, 2],
+    e: "Bâillements, yeux qui piquent, nuque raide, difficulté à garder une trajectoire : il faut s'arrêter et faire une courte sieste.",
+    m: "Bâillements, yeux, nuque = STOP sieste." },
+  { id: "CON-07", c: "CON", d: 1, q: "Pour faire baisser mon taux d'alcool plus vite, quelle méthode est efficace ?",
+    o: ["Boire du café", "Prendre une douche froide", "Attendre", "Manger"], a: [2],
+    e: "Seul le temps élimine l'alcool, à raison d'environ 0,10 à 0,15 g/l par heure. Café, douche ou repas n'accélèrent pas l'élimination.",
+    m: "Alcool : seul le temps compte." },
+  { id: "CON-08", c: "CON", d: 2, q: "Un médicament porte un pictogramme rouge de niveau 3. Que dois-je faire ?",
+    o: ["Conduire prudemment", "Ne pas conduire", "Conduire seulement de jour"], a: [1],
+    e: "Niveau 1 (jaune) : soyez prudent. Niveau 2 (orange) : soyez très prudent, avis d'un professionnel de santé. Niveau 3 (rouge) : ne pas conduire.",
+    m: "Jaune prudent, orange très prudent, rouge = ne conduis pas." },
+  { id: "CON-09", c: "CON", d: 2, q: "Un médicament porte un pictogramme orange de niveau 2. Que signifie-t-il ?",
+    o: ["Soyez prudent, aucune autre précaution", "Soyez très prudent, ne conduisez pas sans l'avis d'un professionnel de santé", "Interdiction absolue de conduire"], a: [1],
+    e: "Le niveau 2 impose de demander l'avis d'un médecin ou d'un pharmacien avant de conduire.",
+    t: "Ce n'est pas une interdiction : c'est le niveau 3 (rouge).", m: "Orange = demande au médecin." },
+  { id: "CON-10", c: "CON", d: 1, q: "Quand ma vitesse augmente, mon champ visuel :",
+    o: ["S'élargit", "Se rétrécit", "Ne change pas"], a: [1],
+    e: "Plus la vitesse augmente, plus le champ de vision utile se rétrécit : les dangers sur les côtés sont perçus plus tard.",
+    m: "Plus vite = vision en tunnel." },
+  { id: "CON-11", c: "CON", d: 1, q: "La nuit, je suis ébloui par les phares d'un véhicule en face. Où dois-je regarder ?",
+    o: ["Droit dans les phares pour m'habituer", "Le bord droit de la chaussée", "Le centre de la route"], a: [1],
+    e: "Regarder le bord droit de la chaussée permet de garder sa trajectoire sans être aveuglé. Il faut aussi ralentir.",
+    m: "Ébloui = je regarde à droite et je ralentis." },
+  { id: "CON-12", c: "CON", d: 2, q: "En conduisant, un écran placé dans mon champ de vision peut-il afficher une vidéo ?",
+    o: OUI_NON, a: [1],
+    e: "Les écrans dans le champ de vision du conducteur ne peuvent afficher que des aides à la conduite ou à la navigation (GPS). Vidéo, films, jeux : interdits.",
+    m: "Écran au volant : GPS oui, vidéo non.", r: "Code de la route, art. R412-6-2" },
+  { id: "CON-13", c: "CON", d: 1, q: "Puis-je écouter de la musique avec des écouteurs en conduisant ?",
+    o: OUI_NON, a: [1],
+    e: "Écouteurs, casque et oreillettes sont interdits au volant, quel que soit l'usage (musique ou téléphone).", m: "Rien dans les oreilles au volant." },
+  { id: "CON-14", c: "CON", d: 2, q: "Quels comportements réduisent la consommation de carburant ?",
+    o: ["Anticiper pour éviter les freinages", "Passer rapidement le rapport supérieur", "Rouler avec des pneus sous-gonflés", "Laisser le moteur tourner à l'arrêt"], a: [0, 1],
+    e: "Anticipation et passage rapide des rapports réduisent la consommation. Des pneus sous-gonflés et un moteur au ralenti l'augmentent.",
+    m: "Éco-conduite : anticiper, monter les rapports, pneus bien gonflés." },
+  { id: "CON-15", c: "CON", d: 2, q: "À vitesse doublée, l'énergie libérée lors d'un choc est multipliée par :",
+    o: ["2", "4", "8"], a: [1],
+    e: "L'énergie cinétique dépend du carré de la vitesse : une vitesse multipliée par 2 donne une énergie multipliée par 4.",
+    m: "Vitesse × 2 = choc × 4." },
+  { id: "CON-16", c: "CON", d: 3, q: "Une distance de sécurité de 2 secondes à 90 km/h correspond environ à :",
+    o: ["25 m", "50 m", "90 m"], a: [1],
+    e: "À 90 km/h, on parcourt 25 m par seconde. 2 secondes représentent donc environ 50 m, soit 2 traits de ligne de rive sur route.",
+    m: "2 secondes à 90 km/h ≈ 50 m." },
+
+  // ───────────── CIRCULATION ET PRIORITÉS ─────────────
+  { id: "CIR-01", c: "CIR", d: 1, img: "cyclistOut", q: "Hors agglomération, je dépasse un cycliste. Quelle distance latérale minimale dois-je respecter ?",
+    o: ["50 cm", "1 mètre", "1,50 mètre", "2 mètres"], a: [2],
+    e: "Hors agglomération, il faut au moins 1,50 m entre le véhicule et le cycliste. En agglomération, au moins 1 m.",
+    t: "Le chiffre change selon le lieu : regarde d'abord si tu es en ou hors agglomération.",
+    m: "Hors agglomération = 1,50 m ; en ville = 1 m.", r: "Code de la route, art. R414-4" },
+  { id: "CIR-02", c: "CIR", d: 1, img: "cyclistIn", q: "En agglomération, je dépasse un cycliste. Quelle distance latérale minimale dois-je respecter ?",
+    o: ["50 cm", "1 mètre", "1,50 mètre", "2 mètres"], a: [1],
+    e: "En agglomération, la distance latérale minimale est de 1 m. Hors agglomération, elle passe à 1,50 m.",
+    m: "En ville = 1 m ; hors agglo = 1,50 m.", r: "Code de la route, art. R414-4" },
+  { id: "CIR-03", c: "CIR", d: 2, q: "Hors agglomération, je dépasse un piéton qui marche au bord de la chaussée. Quelle distance latérale minimale dois-je laisser ?",
+    o: ["1 mètre", "1,50 mètre", "Aucune distance imposée"], a: [1],
+    e: "La règle des 1 m (agglomération) / 1,50 m (hors agglomération) vaut pour les cyclistes, mais aussi pour les piétons, cavaliers, deux-roues et animaux.",
+    t: "La règle ne concerne pas que les cyclistes.", m: "Piéton, vélo, cavalier : 1 m en ville, 1,50 m hors agglo.", r: "Code de la route, art. R414-4" },
+  { id: "CIR-04", c: "CIR", d: 3, q: "Une ligne continue sépare les deux sens. Un cycliste roule lentement devant moi et la visibilité est suffisante. Puis-je chevaucher la ligne continue pour le dépasser ?",
+    o: OUI_NON, a: [0],
+    e: "Exception : pour dépasser un cycle (ou un engin de déplacement personnel), le conducteur peut chevaucher une ligne continue si la visibilité est suffisante, en respectant la distance latérale.",
+    t: "Exception réservée aux cycles et engins de déplacement personnel, avec visibilité suffisante.", m: "Cycliste + bonne visibilité = je peux chevaucher la ligne continue." },
+  { id: "CIR-05", c: "CIR", d: 1, img: "highway3", q: "Je circule sur une autoroute à trois voies. La voie de droite est libre. Puis-je rester sur la voie centrale sans dépasser ?",
+    o: OUI_NON, a: [1],
+    e: "Il faut circuler sur la voie disponible la plus à droite. La voie centrale sert à dépasser ; ensuite on se rabat.",
+    m: "Voie de droite libre = je m'y rabats.", r: "Code de la route, art. R412-9" },
+  { id: "CIR-06", c: "CIR", d: 2, q: "Sur autoroute, par beau temps, je circule sur la voie la plus à gauche. Quelle est la vitesse minimale imposée ?",
+    o: ["Aucune", "60 km/h", "80 km/h"], a: [2],
+    e: "Sur autoroute, la voie la plus à gauche ne peut être utilisée à moins de 80 km/h dans des conditions normales de circulation et de visibilité.",
+    m: "Voie de gauche d'autoroute : minimum 80 km/h.", r: "Code de la route, art. R413-19" },
+  { id: "CIR-07", c: "CIR", d: 1, q: "Sur autoroute, il pleut. Quelle est la vitesse maximale autorisée pour un conducteur en permis définitif ?",
+    o: ["100 km/h", "110 km/h", "130 km/h"], a: [1],
+    e: "Par temps de pluie, la limite passe de 130 à 110 km/h sur autoroute.", m: "Pluie : 130 → 110 ; 110 → 100 ; 80 → 70.", r: "Code de la route, art. R413-2" },
+  { id: "CIR-08", c: "CIR", d: 2, q: "Hors agglomération, sur une route à double sens sans séparateur central et sans panneau, quelle est la vitesse maximale par temps sec ?",
+    o: ["70 km/h", "80 km/h", "90 km/h"], a: [1],
+    e: "La limite générale est 80 km/h. Une limite à 90 km/h n'existe que si elle est indiquée par panneau (décision locale).",
+    t: "90 km/h n'est possible que si un panneau l'indique.", m: "Route à double sens sans panneau = 80 km/h.", r: "Code de la route, art. R413-2" },
+  { id: "CIR-09", c: "CIR", d: 2, q: "Sur une route à 2 × 2 voies séparées par un terre-plein central (hors autoroute), il pleut. Quelle est la vitesse maximale ?",
+    o: ["90 km/h", "100 km/h", "110 km/h"], a: [1],
+    e: "Ces routes sont limitées à 110 km/h, et à 100 km/h par temps de pluie.", m: "2 × 2 voies séparées : 110, pluie 100." },
+  { id: "CIR-10", c: "CIR", d: 2, q: "Sur autoroute, un brouillard réduit la visibilité à moins de 50 m. Quelle est la vitesse maximale ?",
+    o: ["50 km/h", "70 km/h", "90 km/h"], a: [0],
+    e: "Visibilité inférieure à 50 m : 50 km/h sur toutes les routes, y compris l'autoroute.",
+    t: "Le type de route ne change rien sous les 50 m de visibilité.", m: "Visibilité < 50 m = 50 km/h partout.", r: "Code de la route, art. R413-4" },
+  { id: "CIR-11", c: "CIR", d: 1, q: "Je suis en permis probatoire. Quelle est ma vitesse maximale sur autoroute par temps sec ?",
+    o: ["100 km/h", "110 km/h", "130 km/h"], a: [1],
+    e: "Jeunes conducteurs : 110 km/h sur autoroute, 100 km/h sur 2 × 2 voies séparées, 80 km/h sur les autres routes.", m: "Probatoire sur autoroute = 110." },
+  { id: "CIR-12", c: "CIR", d: 1, img: "crossRight", q: "J'arrive à une intersection sans panneau ni feu. Une voiture arrive sur ma droite. Qui passe en premier ?",
+    o: ["Moi", "La voiture venant de droite"], a: [1],
+    e: "Sans signalisation, la priorité à droite s'applique.", m: "Pas de panneau = priorité à droite.", r: "Code de la route, art. R415-5" },
+  { id: "CIR-13", c: "CIR", d: 2, img: "dirtRoad", q: "Une voiture arrive sur ma droite en sortant d'un chemin de terre. Qui est prioritaire ?",
+    o: ["Moi", "La voiture venant de droite"], a: [0],
+    e: "Un conducteur qui sort d'un chemin de terre, d'un parking ou d'une propriété privée doit céder le passage. La priorité à droite ne s'applique pas.",
+    t: "Venir de droite ne suffit pas : il faut venir d'une route ouverte à la circulation.", m: "Chemin de terre, parking, garage : il cède.", r: "Code de la route, art. R415-9" },
+  { id: "CIR-14", c: "CIR", d: 2, img: "roundaboutYield", q: "J'arrive à un carrefour giratoire. Un panneau « Cédez le passage » est placé à l'entrée. Qui est prioritaire ?",
+    o: ["Les véhicules déjà dans l'anneau", "Moi, car je viens de la droite"], a: [0],
+    e: "Avec un cédez-le-passage à l'entrée, les véhicules qui circulent déjà dans l'anneau sont prioritaires.",
+    m: "Giratoire signalé : l'anneau est prioritaire." },
+  { id: "CIR-15", c: "CIR", d: 3, q: "J'arrive sur une place circulaire sans aucun « Cédez le passage » ni stop à l'entrée. Je suis déjà dans l'anneau et un véhicule veut entrer sur ma droite. Qui passe ?",
+    o: ["Moi, car je suis dans l'anneau", "Le véhicule qui entre"], a: [1],
+    e: "Sans cédez-le-passage à l'entrée, la priorité à droite s'applique : ceux qui entrent sont prioritaires sur ceux qui tournent.",
+    t: "C'est l'inverse d'un giratoire classique : vérifie toujours la signalisation d'entrée.", m: "Pas de cédez à l'entrée = ceux qui entrent passent." },
+  { id: "CIR-16", c: "CIR", d: 2, q: "À une intersection sans feu, un tramway arrive. Qui est prioritaire ?",
+    o: ["Le tramway, sauf signalisation contraire", "Le véhicule venant de droite", "Celui qui arrive en premier"], a: [0],
+    e: "Il faut céder le passage aux véhicules circulant sur voie ferrée (tramways), sauf indication contraire des feux ou d'un agent.",
+    m: "Tramway prioritaire, sauf feux contraires." },
+  { id: "CIR-17", c: "CIR", d: 2, q: "Les feux d'un carrefour sont éteints (panne). Quelles règles dois-je appliquer ?",
+    o: ["Je peux passer, le carrefour est libre", "Les panneaux présents, sinon la priorité à droite", "Je dois toujours m'arrêter comme à un stop"], a: [1],
+    e: "Quand les feux ne fonctionnent pas, on applique la signalisation verticale présente ; à défaut, la priorité à droite.",
+    m: "Feux éteints = panneaux, sinon priorité à droite." },
+  { id: "CIR-18", c: "CIR", d: 1, q: "Un agent de police règle la circulation alors que le feu est vert pour moi. L'agent me fait signe de m'arrêter. Que dois-je faire ?",
+    o: ["Passer, le feu est vert", "M'arrêter"], a: [1],
+    e: "Les indications d'un agent priment sur les feux et les panneaux.", m: "Agent > feux > panneaux > règles générales." },
+  { id: "CIR-19", c: "CIR", d: 1, q: "Le feu passe à l'orange fixe. Je peux m'arrêter sans danger. Que dois-je faire ?",
+    o: ["Accélérer pour passer", "M'arrêter"], a: [1],
+    e: "Le feu orange fixe impose l'arrêt, sauf si l'arrêt est impossible dans des conditions de sécurité suffisantes.",
+    m: "Orange fixe = je m'arrête si je peux." },
+  { id: "CIR-20", c: "CIR", d: 2, q: "Un feu jaune clignote à l'intersection. Que dois-je faire ?",
+    o: ["M'arrêter obligatoirement", "Passer avec prudence en appliquant les règles de priorité", "Passer, j'ai la priorité"], a: [1],
+    e: "Le feu jaune clignotant signale un danger : on passe avec prudence en respectant les panneaux ou la priorité à droite.",
+    m: "Jaune clignotant = prudence + règles de priorité." },
+  { id: "CIR-21", c: "CIR", d: 3, q: "Le feu est rouge, mais une flèche jaune clignotante indique la droite. Je veux tourner à droite. Que dois-je faire ?",
+    o: ["Attendre le vert", "Tourner en cédant le passage aux piétons et aux véhicules", "Tourner, je suis prioritaire"], a: [1],
+    e: "La flèche clignotante autorise à tourner dans la direction indiquée, en cédant le passage à tous les usagers, notamment les piétons.",
+    m: "Flèche clignotante = je tourne en cédant le passage." },
+  { id: "CIR-22", c: "CIR", d: 3, q: "Dans quels cas puis-je dépasser par la droite ?",
+    o: ["Un véhicule qui a signalé qu'il tourne à gauche et s'est déporté", "Un tramway en mouvement, si l'espace est suffisant", "Un véhicule lent sur une route à double sens, par commodité"], a: [0, 1],
+    e: "Le dépassement se fait par la gauche, sauf deux exceptions principales : un véhicule qui tourne à gauche, et un tramway (dépassé par la droite si l'espace le permet).",
+    m: "Par la droite : celui qui tourne à gauche, et le tram." },
+  { id: "CIR-23", c: "CIR", d: 2, q: "Dans quels cas le dépassement est-il interdit ?",
+    o: ["À l'approche d'un sommet de côte sans visibilité", "Quand le véhicule devant ralentit pour laisser passer un piéton", "Sur une route droite et dégagée à ligne discontinue"], a: [0, 1],
+    e: "Dépasser est interdit sans visibilité suffisante (sommet de côte, virage) et quand le véhicule précédent s'arrête ou ralentit pour un piéton.",
+    m: "Pas de visibilité, piéton devant = pas de dépassement." },
+  { id: "CIR-24", c: "CIR", d: 1, q: "Quelle distance de sécurité minimale dois-je garder avec le véhicule qui me précède ?",
+    o: ["1 seconde", "2 secondes", "Aucune règle précise"], a: [1],
+    e: "Il faut au moins 2 secondes entre soi et le véhicule devant. On l'augmente par mauvais temps.", m: "Au moins 2 secondes." },
+  { id: "CIR-25", c: "CIR", d: 1, img: "arrowLeft", q: "Je circule sur une voie dont la flèche au sol impose de tourner à gauche. Je voudrais continuer tout droit. Si je reste sur cette voie, dois-je respecter la flèche ?",
+    o: OUI_NON, a: [0],
+    e: "Les flèches directionnelles délimitées par des lignes continues imposent la direction. Si je reste sur cette voie, je tourne à gauche, puis je change d'itinéraire plus loin.",
+    t: "Ne coupe pas la ligne continue au dernier moment : suis la flèche et rectifie ton trajet ensuite.", m: "Flèche au sol entre lignes continues = direction obligatoire." },
+  { id: "CIR-26", c: "CIR", d: 1, q: "Sur autoroute, j'ai manqué ma sortie. Que dois-je faire ?",
+    o: ["Faire marche arrière sur la bande d'arrêt d'urgence", "Continuer jusqu'à la sortie suivante", "Faire demi-tour par une interruption du terre-plein"], a: [1],
+    e: "Marche arrière, demi-tour et traversée du terre-plein sont interdits sur autoroute. On continue jusqu'à la prochaine sortie.",
+    m: "Sortie ratée = sortie suivante." },
+  { id: "CIR-27", c: "CIR", d: 1, q: "Je suis sur la voie d'accélération pour entrer sur l'autoroute. Suis-je prioritaire sur les véhicules qui y circulent déjà ?",
+    o: OUI_NON, a: [1],
+    e: "Le conducteur qui s'insère doit céder le passage aux véhicules circulant sur l'autoroute. Il adapte sa vitesse sur la voie d'accélération.",
+    m: "Je m'insère = je cède." },
+
+  // ───────────── AUTRES USAGERS ─────────────
+  { id: "USA-01", c: "USA", d: 1, q: "Un autocar porte à l'arrière un pictogramme représentant deux enfants, l'un plus grand tenant la main d'un plus petit. Que signifie ce pictogramme ?",
+    o: ["Le véhicule effectue un transport d'enfants", "Le véhicule est réservé aux personnes handicapées", "Le véhicule transporte exclusivement des adultes", "Le véhicule bénéficie toujours d'une priorité absolue"], a: [0],
+    e: "Ce pictogramme signale un transport d'enfants. Il n'accorde aucune priorité ; il invite à la prudence, surtout lors des arrêts.",
+    t: "Signal de prudence, pas de priorité.", m: "Pictogramme enfants = prudence, pas priorité." },
+  { id: "USA-02", c: "USA", d: 2, q: "Un autocar de transport d'enfants est arrêté, feux de détresse allumés, et des enfants descendent. Que dois-je faire ?",
+    o: ["Klaxonner pour les prévenir", "Ralentir fortement et être prêt à m'arrêter", "Garder ma vitesse, ils doivent attendre"], a: [1],
+    e: "Un enfant peut surgir devant ou derrière le car. Il faut ralentir fortement et être prêt à s'arrêter.",
+    m: "Car d'enfants à l'arrêt = je ralentis fort." },
+  { id: "USA-03", c: "USA", d: 1, q: "Une personne se déplace sur une trottinette sans moteur. Est-elle assimilée à un piéton ?",
+    o: OUI_NON, a: [0],
+    e: "Une personne utilisant une trottinette non motorisée (ou des rollers) est assimilée à un piéton.", m: "Sans moteur = piéton." },
+  { id: "USA-04", c: "USA", d: 1, q: "Une personne utilise une trottinette électrique. Est-elle soumise exactement aux mêmes règles qu'un piéton ?",
+    o: OUI_NON, a: [1],
+    e: "La trottinette électrique est un engin de déplacement personnel motorisé (EDPM), avec des règles propres : piste cyclable ou chaussée, 25 km/h maximum, une seule personne.",
+    m: "Avec moteur = EDPM, pas piéton." },
+  { id: "USA-05", c: "USA", d: 2, q: "Quel âge minimum faut-il avoir pour conduire une trottinette électrique ?",
+    o: ["12 ans", "14 ans", "16 ans"], a: [1],
+    e: "Depuis 2023, l'âge minimum pour conduire un engin de déplacement personnel motorisé est de 14 ans.", m: "Trottinette électrique : 14 ans minimum." },
+  { id: "USA-06", c: "USA", d: 2, q: "Une trottinette électrique peut-elle circuler sur le trottoir ?",
+    o: ["Oui, librement", "Non, sauf autorisation locale, et alors à l'allure du pas"], a: [1],
+    e: "Les EDPM sont interdits sur le trottoir, sauf si le maire l'autorise ; ils roulent alors à l'allure du pas. Ils peuvent être tenus à la main comme un piéton.",
+    m: "Trottinette électrique : pas sur le trottoir." },
+  { id: "USA-07", c: "USA", d: 1, img: "crosswalk", q: "Un piéton manifeste clairement son intention de traverser au passage piéton. Que dois-je faire ?",
+    o: ["Passer, il n'est pas encore engagé", "M'arrêter pour le laisser traverser"], a: [1],
+    e: "Le conducteur doit céder le passage au piéton qui s'engage ou qui manifeste clairement l'intention de traverser.",
+    t: "Le piéton n'a pas besoin d'avoir posé le pied sur la chaussée.", m: "Intention claire = je m'arrête.", r: "Code de la route, art. R415-11" },
+  { id: "USA-08", c: "USA", d: 2, q: "En agglomération, un bus signale qu'il quitte son arrêt. Que dois-je faire ?",
+    o: ["Accélérer pour passer avant", "Ralentir et m'arrêter si nécessaire pour le laisser repartir", "Klaxonner"], a: [1],
+    e: "En agglomération, il faut faciliter le départ des véhicules de transport en commun qui quittent un arrêt signalé.",
+    m: "En ville, le bus qui repart passe." },
+  { id: "USA-09", c: "USA", d: 2, q: "Je circule dans une zone de rencontre. Quelles affirmations sont exactes ?",
+    o: ["La vitesse est limitée à 20 km/h", "Les piétons peuvent circuler sur la chaussée", "Les piétons sont prioritaires", "La vitesse est limitée à 30 km/h"], a: [0, 1, 2],
+    e: "Zone de rencontre : 20 km/h, piétons prioritaires et autorisés à marcher sur la chaussée. Zone 30 : 30 km/h. Aire piétonne : allure du pas.",
+    m: "Rencontre = 20 ; zone 30 = 30 ; aire piétonne = pas." },
+  { id: "USA-10", c: "USA", d: 2, q: "J'emprunte une rue à sens unique dont l'entrée porte le panonceau « sauf cycles ». Que puis-je rencontrer ?",
+    o: ["Des cyclistes venant en sens inverse", "Des voitures venant en sens inverse", "Rien de particulier"], a: [0],
+    e: "C'est un double-sens cyclable : les cyclistes peuvent circuler dans les deux sens. Il faut serrer à droite et rester attentif.",
+    m: "« Sauf cycles » = vélos en face possibles." },
+  { id: "USA-11", c: "USA", d: 2, q: "Des cyclistes roulent à deux de front sur une route. Dans quels cas doivent-ils se mettre en file ?",
+    o: ["À la tombée de la nuit", "Lorsqu'un véhicule veut les dépasser", "Lorsque les conditions de circulation l'exigent", "Jamais"], a: [0, 1, 2],
+    e: "Les cyclistes peuvent rouler à deux de front, mais doivent se mettre en file la nuit, quand un véhicule veut dépasser ou quand la circulation l'exige.",
+    m: "Deux de front oui, sauf nuit, dépassement ou trafic." },
+  { id: "USA-12", c: "USA", d: 1, q: "Un enfant de 10 ans fait du vélo. Le casque est-il obligatoire ?",
+    o: OUI_NON, a: [0],
+    e: "Le casque est obligatoire pour les cyclistes de moins de 12 ans, conducteurs ou passagers.", m: "Vélo < 12 ans = casque obligatoire." },
+  { id: "USA-13", c: "USA", d: 2, q: "Un enfant de 7 ans roule à vélo. Peut-il circuler sur le trottoir ?",
+    o: ["Oui, à l'allure du pas", "Non, jamais"], a: [0],
+    e: "Les enfants de moins de 8 ans peuvent rouler à vélo sur les trottoirs, à l'allure du pas et sans gêner les piétons.", m: "Vélo sur trottoir : moins de 8 ans, au pas." },
+  { id: "USA-14", c: "USA", d: 1, q: "Une ambulance arrive derrière moi avec feux bleus et sirène deux tons. Que dois-je faire ?",
+    o: ["Freiner brusquement", "Faciliter son passage en me décalant si possible", "Garder ma trajectoire, je n'ai rien à faire"], a: [1],
+    e: "Il faut faciliter le passage des véhicules prioritaires en se décalant ou en s'arrêtant si nécessaire, sans manœuvre dangereuse.",
+    m: "Bleu + sirène = je facilite le passage." },
+  { id: "USA-15", c: "USA", d: 2, q: "Une dépanneuse avec un gyrophare orange est arrêtée sur la chaussée. A-t-elle la priorité ?",
+    o: OUI_NON, a: [1],
+    e: "Le feu spécial orange signale un danger ou un véhicule lent ; il ne donne aucune priorité. Seuls les véhicules à feux bleus et sirène sont prioritaires.",
+    t: "Orange = danger ; bleu + sirène = priorité.", m: "Gyrophare orange = attention, pas priorité." },
+  { id: "USA-16", c: "USA", d: 1, q: "Un camion porte un autocollant « angles morts ». Que signale-t-il ?",
+    o: ["Les zones où le chauffeur ne peut pas me voir", "Que le camion transporte des matières dangereuses", "Que le camion est prioritaire"], a: [0],
+    e: "Cette signalétique est obligatoire sur les véhicules de plus de 3,5 t. Elle rappelle aux cyclistes, piétons et deux-roues les zones invisibles pour le chauffeur.",
+    m: "Angles morts : si je ne vois pas ses rétros, il ne me voit pas." },
+  { id: "USA-17", c: "USA", d: 2, q: "Hors agglomération, sur une route sans trottoir, de quel côté les piétons doivent-ils marcher ?",
+    o: ["Sur le bord gauche, face aux véhicules", "Sur le bord droit"], a: [0],
+    e: "Hors agglomération, les piétons marchent en principe sur le bord gauche de la chaussée, face aux véhicules, sauf si cela compromet leur sécurité.",
+    m: "Piéton hors agglo = à gauche, face au trafic." },
+  { id: "USA-18", c: "USA", d: 2, q: "Au feu rouge, un panonceau autorise les cyclistes à tourner à droite. Un cycliste devant moi tourne à droite alors que le feu est rouge. Est-il en infraction ?",
+    o: OUI_NON, a: [1],
+    e: "Le panonceau de cédez-le-passage cycliste au feu autorise les cyclistes à franchir le feu rouge dans la direction indiquée, en cédant le passage.",
+    m: "Panonceau vélo au feu = le cycliste peut passer en cédant." },
+  { id: "USA-19", c: "USA", d: 1, img: "sasVelo", q: "Le feu est rouge. Devant la ligne d'arrêt des voitures se trouve une zone avec un vélo dessiné au sol (sas vélo). Puis-je m'y arrêter avec ma voiture ?",
+    o: OUI_NON, a: [1],
+    e: "Le sas vélo est réservé aux cycles. Les voitures doivent s'arrêter à la première ligne d'arrêt.",
+    m: "Sas vélo = pour les vélos, j'attends derrière." },
+  { id: "USA-20", c: "USA", d: 2, q: "Une personne avec une canne blanche s'apprête à traverser hors passage piéton. Que dois-je faire ?",
+    o: ["Continuer, elle n'est pas sur un passage", "M'arrêter et la laisser traverser"], a: [1],
+    e: "La canne blanche signale une personne aveugle ou malvoyante. Il faut s'arrêter et faciliter sa traversée, même hors passage.",
+    m: "Canne blanche = je m'arrête." },
+
+  // ───────────── ÉQUIPEMENTS DE SÉCURITÉ ─────────────
+  { id: "EQU-01", c: "EQU", d: 1, q: "Quels équipements dois-je obligatoirement avoir dans ma voiture ?",
+    o: ["Un gilet de haute visibilité", "Un triangle de présignalisation", "Un extincteur", "Une trousse de secours"], a: [0, 1],
+    e: "Gilet et triangle sont obligatoires. Extincteur et trousse de secours sont recommandés mais pas obligatoires pour une voiture particulière.",
+    m: "Obligatoire = gilet + triangle." },
+  { id: "EQU-02", c: "EQU", d: 2, q: "Où dois-je ranger le gilet de haute visibilité ?",
+    o: ["Dans le coffre", "À portée de main, pour l'enfiler avant de sortir"], a: [1],
+    e: "Le gilet doit être accessible depuis le poste de conduite pour être enfilé avant de sortir du véhicule.",
+    m: "Gilet à portée de main, enfilé avant de sortir." },
+  { id: "EQU-03", c: "EQU", d: 2, q: "À quelle distance minimale du véhicule dois-je placer le triangle de présignalisation ?",
+    o: ["10 m", "30 m", "100 m"], a: [1],
+    e: "Le triangle se place à au moins 30 m en amont du véhicule. Sa pose n'est pas exigée si elle met en danger, notamment sur autoroute.",
+    m: "Triangle : au moins 30 m." },
+  { id: "EQU-04", c: "EQU", d: 2, q: "Il pleut fortement. Puis-je allumer mon feu de brouillard arrière ?",
+    o: OUI_NON, a: [1],
+    e: "Le feu de brouillard arrière est réservé au brouillard et à la neige. Sous la pluie, il éblouirait les conducteurs derrière.",
+    t: "Le feu de brouillard AVANT, lui, est autorisé par forte pluie.", m: "Brouillard arrière = brouillard ou neige seulement." },
+  { id: "EQU-05", c: "EQU", d: 2, q: "Dans quels cas puis-je utiliser mes feux de brouillard avant ?",
+    o: ["Par brouillard", "Par chute de neige", "Par forte pluie", "En ville la nuit pour mieux voir"], a: [0, 1, 2],
+    e: "Les feux de brouillard avant sont autorisés par brouillard, neige ou forte pluie (et sur routes étroites et sinueuses hors agglomération).",
+    m: "Brouillard avant : brouillard, neige, forte pluie." },
+  { id: "EQU-06", c: "EQU", d: 1, img: "dashRed", q: "En roulant, un voyant rouge s'allume au tableau de bord. Que dois-je faire ?",
+    o: ["Continuer et consulter un garage dans la semaine", "M'arrêter dès que possible en sécurité", "L'ignorer s'il s'éteint"], a: [1],
+    e: "Rouge = alerte grave (pression d'huile, freins, température...). Il faut s'arrêter dès que possible. Orange = anomalie à faire vérifier. Vert ou bleu = information.",
+    m: "Rouge stop ; orange garage ; vert/bleu info." },
+  { id: "EQU-07", c: "EQU", d: 1, img: "dashBlue", q: "Ce voyant bleu est allumé. Quels feux sont en fonction ?",
+    o: ["Les feux de croisement", "Les feux de route", "Les feux de brouillard"], a: [1],
+    e: "Le seul voyant d'éclairage bleu est celui des feux de route. Les feux de croisement ont un voyant vert.",
+    m: "Bleu = pleins phares." },
+  { id: "EQU-08", c: "EQU", d: 2, q: "Le voyant orange de l'ABS reste allumé en roulant. Que se passe-t-il ?",
+    o: ["Je n'ai plus du tout de freins", "Les freins fonctionnent, mais sans l'aide de l'ABS", "Rien, c'est normal"], a: [1],
+    e: "Le freinage classique reste disponible, mais les roues peuvent se bloquer en freinage d'urgence. Il faut faire vérifier rapidement.",
+    m: "Voyant ABS = freins OK, ABS hors service." },
+  { id: "EQU-09", c: "EQU", d: 2, q: "Quel est l'intérêt principal de l'ABS ?",
+    o: ["Garder la possibilité de diriger le véhicule pendant un freinage d'urgence", "Réduire toujours la distance de freinage", "Accélérer plus fort au démarrage"], a: [0],
+    e: "L'ABS empêche le blocage des roues pour que je puisse continuer à braquer en freinant fort. Il ne raccourcit pas forcément la distance de freinage.",
+    t: "ABS ne veut pas dire « freiner plus court ».", m: "ABS = je freine fort ET je dirige." },
+  { id: "EQU-10", c: "EQU", d: 2, q: "Quel est le rôle de l'ESP (correcteur électronique de trajectoire) ?",
+    o: ["Corriger une perte de trajectoire dans les limites des lois physiques", "Permettre de rouler plus vite en virage sans risque", "Remplacer les pneus neige"], a: [0],
+    e: "L'ESP freine certaines roues pour corriger un dérapage. Il ne supprime pas les limites d'adhérence.", m: "ESP aide, mais ne fait pas de miracle." },
+  { id: "EQU-11", c: "EQU", d: 2, q: "Quelle est la différence entre un limiteur et un régulateur de vitesse ?",
+    o: ["Le limiteur empêche de dépasser une vitesse choisie ; le régulateur maintient une vitesse sans action sur l'accélérateur", "Ce sont deux noms du même système", "Le régulateur empêche de dépasser une vitesse ; le limiteur la maintient"], a: [0],
+    e: "Limiteur : plafond de vitesse, je garde le pied sur l'accélérateur. Régulateur : il maintient la vitesse tout seul, à réserver aux trafics fluides.",
+    m: "Limiteur = plafond ; régulateur = pilote." },
+  { id: "EQU-12", c: "EQU", d: 1, q: "Quelle est la profondeur minimale légale des sculptures d'un pneu ?",
+    o: ["1 mm", "1,6 mm", "3 mm"], a: [1],
+    e: "La profondeur minimale est de 1,6 mm. Les témoins d'usure dans les rainures l'indiquent.", m: "Pneu : 1,6 mm minimum." },
+  { id: "EQU-13", c: "EQU", d: 1, q: "Quand dois-je vérifier la pression des pneus ?",
+    o: ["À froid", "Après un long trajet", "Peu importe"], a: [0],
+    e: "La pression se vérifie à froid (après quelques kilomètres maximum), car elle augmente quand le pneu chauffe.", m: "Pression des pneus à froid." },
+  { id: "EQU-14", c: "EQU", d: 2, q: "Comment régler l'appuie-tête ?",
+    o: ["Le haut de l'appuie-tête au niveau du haut de la tête", "Au niveau de la nuque", "Le plus bas possible"], a: [0],
+    e: "Un appuie-tête bien réglé, avec son haut au niveau du sommet du crâne et proche de la tête, limite le coup du lapin.",
+    m: "Appuie-tête = haut de la tête." },
+  { id: "EQU-15", c: "EQU", d: 2, q: "J'installe un siège enfant dos à la route sur le siège passager avant. Que dois-je faire ?",
+    o: ["Désactiver l'airbag frontal passager", "Laisser l'airbag activé pour plus de protection", "Avancer le siège au maximum"], a: [0],
+    e: "Un airbag frontal qui se déclenche face à un siège dos à la route peut tuer l'enfant. Il faut le désactiver.",
+    m: "Siège dos à la route devant = airbag OFF." },
+  { id: "EQU-16", c: "EQU", d: 3, q: "Un enfant de 8 ans peut-il voyager à l'avant d'une voiture ?",
+    o: ["Oui, toujours", "Non, sauf exceptions (pas de places arrière, places arrière déjà occupées par des enfants, siège dos à la route avec airbag désactivé)", "Oui, s'il porte la ceinture"], a: [1],
+    e: "Les enfants de moins de 10 ans voyagent à l'arrière, sauf exceptions prévues par le Code.",
+    m: "Moins de 10 ans = à l'arrière, sauf exceptions." },
+  { id: "EQU-17", c: "EQU", d: 3, q: "Dans les communes de montagne concernées par la loi Montagne, du 1er novembre au 31 mars, que dois-je avoir ?",
+    o: ["Des pneus hiver (ou 4 saisons homologués)", "Des chaînes ou chaussettes à neige dans le coffre", "Des pneus cloutés obligatoirement"], a: [0, 1],
+    e: "L'obligation est remplie avec des pneus hiver/4 saisons homologués OU des dispositifs antidérapants (chaînes, chaussettes) dans le coffre. Les pneus cloutés ne sont jamais obligatoires.",
+    t: "Les deux premières propositions sont des solutions alternatives valables : c'est pourquoi les deux sont justes.", m: "Loi Montagne : pneus hiver OU chaînes à bord." },
+  { id: "EQU-18", c: "EQU", d: 2, q: "Dans quels cas puis-je allumer les feux de détresse ?",
+    o: ["Mon véhicule est immobilisé et constitue un danger", "Je ralentis brusquement à l'approche d'un bouchon sur autoroute", "Je stationne en double file pour une course rapide"], a: [0, 1],
+    e: "Les feux de détresse signalent un danger : véhicule en panne ou accidenté, ralentissement brusque. Ils n'autorisent pas un stationnement interdit.",
+    t: "Les warnings ne rendent jamais un stationnement légal.", m: "Warnings = danger, pas excuse." },
+
+  // ───────────── ARRÊT, STATIONNEMENT, QUITTER LE VÉHICULE ─────────────
+  { id: "QUI-01", c: "QUI", d: 1, img: "busZigzag", q: "Je rencontre un marquage jaune en zigzag qui signale un emplacement réservé à l'arrêt des bus. Puis-je le franchir pour circuler, lorsque la manœuvre est autorisée ?",
+    o: OUI_NON, a: [0],
+    e: "Ce marquage interdit l'arrêt et le stationnement, mais il ne crée pas une voie réservée aux bus. On peut circuler dessus si les autres panneaux et marquages le permettent.",
+    t: "Zigzag = interdit de s'arrêter, pas interdit de rouler.", m: "Zigzag jaune : je peux rouler, pas m'arrêter." },
+  { id: "QUI-02", c: "QUI", d: 1, img: "busZigzag", q: "Puis-je stationner sur un emplacement réservé à l'arrêt des bus (zigzag jaune) ?",
+    o: OUI_NON, a: [1],
+    e: "L'arrêt et le stationnement des autres véhicules y sont interdits.", m: "Arrêt de bus : ni arrêt, ni stationnement." },
+  { id: "QUI-03", c: "QUI", d: 2, q: "Je dépose rapidement un passager sur l'emplacement de l'arrêt de bus, en restant au volant. Est-ce autorisé ?",
+    o: OUI_NON, a: [1],
+    e: "Sur un arrêt de bus, même l'arrêt (montée ou descente d'un passager) est interdit aux autres véhicules.",
+    t: "Rester au volant transforme un stationnement en arrêt, mais l'arrêt aussi est interdit ici.", m: "Arrêt de bus = même pas 10 secondes." },
+  { id: "QUI-04", c: "QUI", d: 1, img: "yellowCont", q: "Le bord du trottoir est peint d'une ligne jaune continue. Qu'est-ce qui est interdit ?",
+    o: ["Seulement le stationnement", "L'arrêt et le stationnement"], a: [1],
+    e: "Ligne jaune continue = arrêt et stationnement interdits. Ligne jaune discontinue = stationnement interdit, arrêt autorisé.",
+    m: "Jaune continu = ni arrêt ni stationnement." },
+  { id: "QUI-05", c: "QUI", d: 2, img: "yellowDash", q: "Le bord du trottoir est peint d'une ligne jaune discontinue. Puis-je m'arrêter pour déposer un passager ?",
+    o: OUI_NON, a: [0],
+    e: "La ligne jaune discontinue interdit seulement le stationnement. L'arrêt bref est autorisé.",
+    t: "Continu ou discontinu : une petite différence qui change la réponse.", m: "Jaune pointillé = arrêt oui, stationnement non." },
+  { id: "QUI-06", c: "QUI", d: 2, q: "Je laisse ma voiture moteur coupé pour aller acheter du pain dans une boutique. Est-ce un arrêt ou un stationnement ?",
+    o: ["Un arrêt, car c'est rapide", "Un stationnement, car je m'éloigne du véhicule"], a: [1],
+    e: "L'arrêt suppose que le conducteur reste aux commandes ou à proximité pour repartir. Si je m'éloigne, c'est un stationnement, quelle que soit la durée.",
+    t: "La durée ne compte pas : c'est la présence du conducteur qui compte.", m: "Je m'éloigne = stationnement." },
+  { id: "QUI-07", c: "QUI", d: 2, q: "Au-delà de quelle durée un stationnement ininterrompu au même endroit sur la voie publique est-il considéré comme abusif ?",
+    o: ["24 heures", "7 jours", "30 jours"], a: [1],
+    e: "Un stationnement de plus de 7 jours consécutifs au même endroit est abusif (sauf durée plus courte fixée par arrêté local).", m: "Stationnement abusif = plus de 7 jours.", r: "Code de la route, art. R417-12" },
+  { id: "QUI-08", c: "QUI", d: 1, q: "Avant d'ouvrir ma portière côté chaussée, que dois-je faire ?",
+    o: ["Regarder dans le rétroviseur", "Tourner la tête pour contrôler l'angle mort", "Ouvrir vite pour ne pas gêner"], a: [0, 1],
+    e: "Il est interdit d'ouvrir une portière si cela crée un danger. On contrôle le rétroviseur et l'angle mort, puis on ouvre progressivement. Ouvrir avec la main opposée aide à tourner le buste.",
+    m: "Rétro + angle mort, puis ouverture lente.", r: "Code de la route, art. R417-7" },
+  { id: "QUI-09", c: "QUI", d: 1, q: "Avant de quitter ma voiture en stationnement, quelles précautions dois-je prendre ?",
+    o: ["Couper le moteur", "Serrer le frein de stationnement", "Retirer la clé et verrouiller", "Laisser le moteur tourner pour garder le chauffage"], a: [0, 1, 2],
+    e: "Moteur coupé, frein serré, vitesse engagée, clé retirée, véhicule verrouillé. Laisser tourner le moteur est interdit et favorise le vol.",
+    m: "Moteur, frein, vitesse, clé, verrou." },
+  { id: "QUI-10", c: "QUI", d: 2, q: "Je stationne dans une descente. Quelle vitesse dois-je engager ?",
+    o: ["La première", "La marche arrière", "Le point mort"], a: [1],
+    e: "En descente, on engage la marche arrière ; en montée, la première. Le moteur s'oppose ainsi au mouvement du véhicule.",
+    t: "On engage la vitesse qui ferait partir dans le sens opposé à la pente.", m: "Descente = marche arrière ; montée = première." },
+  { id: "QUI-11", c: "QUI", d: 2, q: "Je stationne dans une forte pente le long d'un trottoir. Comment orienter mes roues ?",
+    o: ["Roues droites", "Roues braquées vers le trottoir"], a: [1],
+    e: "Roues braquées vers le trottoir : si le frein lâche, la roue bute contre le trottoir et la voiture ne part pas sur la chaussée.",
+    m: "En pente : roues vers le trottoir." },
+  { id: "QUI-12", c: "QUI", d: 1, q: "Il fait chaud. Puis-je laisser un jeune enfant ou un animal seul dans la voiture pendant une courte course ?",
+    o: OUI_NON, a: [1],
+    e: "La température dans un véhicule au soleil monte très vite et peut être mortelle en quelques minutes, même fenêtre entrouverte.", m: "Jamais d'enfant ni d'animal seul dans la voiture." },
+  { id: "QUI-13", c: "QUI", d: 2, q: "Quels stationnements sont considérés comme très gênants (amende de 135 €) ?",
+    o: ["Sur un trottoir", "Sur un passage piéton", "Sur une place réservée aux personnes handicapées sans carte", "Sur une place payante avec un ticket valide"], a: [0, 1, 2],
+    e: "Trottoir, passage piéton, piste cyclable, place handicapé sans carte : stationnement très gênant, 135 €.",
+    m: "Trottoir, passage piéton, piste cyclable, place handicapé = 135 €.", r: "Code de la route, art. R417-11" },
+  { id: "QUI-14", c: "QUI", d: 1, q: "Puis-je stationner sur une bande ou une piste cyclable, même quelques minutes ?",
+    o: OUI_NON, a: [1],
+    e: "Le stationnement sur une piste ou bande cyclable est très gênant : il oblige les cyclistes à se déporter sur la chaussée.", m: "Piste cyclable = jamais de stationnement." },
+  { id: "QUI-15", c: "QUI", d: 2, q: "Sur une route à double sens, de quel côté dois-je en principe stationner ?",
+    o: ["À droite, dans le sens de ma circulation", "Indifféremment à droite ou à gauche"], a: [0],
+    e: "Sur une chaussée à double sens, on s'arrête et stationne sur le côté droit. Sur une chaussée à sens unique, les deux côtés sont possibles sauf indication contraire.",
+    t: "Le sens unique change la réponse.", m: "Double sens = à droite ; sens unique = des deux côtés.", r: "Code de la route, art. R417-3" },
+  { id: "QUI-16", c: "QUI", d: 2, q: "Puis-je m'arrêter en double file quelques instants pour déposer un passager ?",
+    o: OUI_NON, a: [1],
+    e: "L'arrêt et le stationnement en double file sont interdits : ils gênent la circulation et obligent les autres à se déporter.", m: "Double file = interdit, même 1 minute." },
+  { id: "QUI-17", c: "QUI", d: 1, q: "Un passager veut descendre de la voiture garée le long du trottoir. Par quel côté doit-il sortir de préférence ?",
+    o: ["Côté trottoir", "Côté chaussée"], a: [0],
+    e: "Les passagers descendent côté trottoir, à l'abri de la circulation.", m: "Passagers : sortie côté trottoir." },
+
+  // ───────────── SIGNALISATION ET SITUATIONS COMPLEXES ─────────────
+  { id: "SIG-01", c: "SIG", d: 1, img: "busLane", q: "Une voie est signalée comme réservée aux bus. Puis-je l'emprunter simplement parce qu'elle se trouve à droite ?",
+    o: OUI_NON, a: [1],
+    e: "L'obligation de circuler à droite ne permet pas d'utiliser une voie réservée à une autre catégorie d'usagers.",
+    m: "Voie bus : je n'y vais pas, même si elle est à droite." },
+  { id: "SIG-02", c: "SIG", d: 2, img: "busLaneTurn", q: "Une voie réservée aux bus est délimitée par une ligne discontinue. Je veux tourner à droite juste après. Puis-je la traverser pour tourner ?",
+    o: OUI_NON, a: [0],
+    e: "Une ligne discontinue peut être franchie : je peux traverser la voie bus pour tourner à droite, en cédant le passage aux bus. Je ne dois pas y circuler sur la longueur.",
+    t: "Traverser ≠ circuler dessus. Avec une ligne continue, la traversée serait interdite.", m: "Voie bus en pointillés : je la traverse pour tourner, je n'y roule pas." },
+  { id: "SIG-03", c: "SIG", d: 2, img: "signAB6", q: "Que m'indique ce panneau ?",
+    o: ["Je suis sur une route à caractère prioritaire", "Je dois céder le passage à la prochaine intersection", "Fin de route prioritaire"], a: [0],
+    e: "Le losange jaune (AB6) indique une route à caractère prioritaire : je suis prioritaire à chaque intersection jusqu'au panneau de fin (losange barré).",
+    m: "Losange jaune = prioritaire jusqu'au losange barré." },
+  { id: "SIG-04", c: "SIG", d: 2, img: "signAB2", q: "Que m'indique ce panneau ?",
+    o: ["Je suis prioritaire à la prochaine intersection seulement", "Je suis prioritaire jusqu'à nouvel ordre", "Priorité à droite à la prochaine intersection"], a: [0],
+    e: "Le triangle avec un trait vertical épais coupé d'un trait fin (AB2) annonce une priorité ponctuelle, à la prochaine intersection uniquement.",
+    m: "Triangle + croix « fine » = prioritaire une seule fois." },
+  { id: "SIG-05", c: "SIG", d: 2, img: "signAB1", q: "Que m'indique ce panneau ?",
+    o: ["Intersection avec priorité à droite", "Passage à niveau", "Je suis prioritaire"], a: [0],
+    e: "Le triangle avec une croix noire (AB1) annonce une intersection où s'applique la priorité à droite.",
+    m: "Triangle + X = priorité à droite." },
+  { id: "SIG-06", c: "SIG", d: 1, img: "signStop", q: "J'arrive à un stop. Aucun véhicule n'arrive, la visibilité est parfaite. Dois-je marquer l'arrêt ?",
+    o: OUI_NON, a: [0],
+    e: "Au stop, l'arrêt complet à la limite de la chaussée est obligatoire, même sans aucun véhicule.", m: "Stop = arrêt complet, toujours." },
+  { id: "SIG-07", c: "SIG", d: 1, img: "signYield", q: "J'arrive à un « Cédez le passage ». La voie est entièrement libre et dégagée. Dois-je m'arrêter ?",
+    o: OUI_NON, a: [1],
+    e: "Le cédez-le-passage n'impose l'arrêt que si un usager arrive. Si la voie est libre, je passe avec prudence.",
+    t: "Différence clé avec le stop.", m: "Cédez = arrêt seulement si nécessaire." },
+  { id: "SIG-08", c: "SIG", d: 1, img: "signB6d", q: "Que m'interdit ce panneau ?",
+    o: ["Le stationnement seulement", "L'arrêt et le stationnement", "La circulation"], a: [1],
+    e: "Fond bleu, bord rouge, croix rouge (B6d) : arrêt et stationnement interdits.", m: "Croix rouge = ni arrêt ni stationnement." },
+  { id: "SIG-09", c: "SIG", d: 1, img: "signB6a1", q: "Que m'interdit ce panneau ?",
+    o: ["Le stationnement", "L'arrêt et le stationnement", "Le dépassement"], a: [0],
+    e: "Une seule barre rouge (B6a1) : stationnement interdit, l'arrêt reste autorisé.", m: "Une barre = stationnement interdit ; croix = arrêt aussi." },
+  { id: "SIG-10", c: "SIG", d: 1, q: "Une ligne blanche continue sépare les deux sens de circulation. Que m'est-il interdit de faire ?",
+    o: ["La franchir", "La chevaucher", "Rouler à côté"], a: [0, 1],
+    e: "Une ligne continue ne doit être ni franchie ni chevauchée (sauf exception pour dépasser un cycle avec visibilité suffisante).", m: "Ligne continue : ni franchir ni chevaucher." },
+  { id: "SIG-11", c: "SIG", d: 2, img: "mixedLine", q: "Une ligne mixte (continue + discontinue) sépare les sens. La ligne discontinue est de mon côté. Puis-je la franchir pour dépasser ?",
+    o: OUI_NON, a: [0],
+    e: "On ne tient compte que de la ligne la plus proche : côté discontinu, je peux franchir pour dépasser, puis me rabattre. Côté continu, interdit.",
+    m: "Ligne mixte : je lis la ligne de mon côté." },
+  { id: "SIG-12", c: "SIG", d: 2, q: "Des marquages jaunes temporaires (travaux) contredisent les marquages blancs. Lesquels dois-je suivre ?",
+    o: ["Les marquages blancs", "Les marquages jaunes temporaires"], a: [1],
+    e: "Les marquages jaunes de chantier remplacent temporairement les marquages blancs.", m: "Jaune de chantier > blanc." },
+  { id: "SIG-13", c: "SIG", d: 2, img: "rabattement", q: "Des flèches obliques apparaissent au sol entre les voies. Que m'annoncent-elles ?",
+    o: ["Je dois me rabattre, une ligne continue arrive", "Une voie supplémentaire s'ouvre", "Une sortie à gauche"], a: [0],
+    e: "Les flèches de rabattement annoncent la fin d'une voie ou l'arrivée d'une ligne continue : il faut se rabattre.", m: "Flèches de rabattement = je me rabats." },
+  { id: "SIG-14", c: "SIG", d: 2, img: "pnLights", q: "Au passage à niveau, les feux rouges clignotent mais les barrières sont encore levées. Que dois-je faire ?",
+    o: ["Passer vite avant que les barrières descendent", "M'arrêter"], a: [1],
+    e: "Les feux rouges clignotants imposent l'arrêt, même si les barrières sont levées : un train approche.", m: "Feux rouges clignotants au PN = arrêt." },
+  { id: "SIG-15", c: "SIG", d: 2, q: "Mon véhicule tombe en panne sur les voies d'un passage à niveau. Que dois-je faire ?",
+    o: ["Faire sortir tous les occupants et s'éloigner des voies", "Alerter avec le téléphone d'appel du passage à niveau ou le 112", "Rester dans la voiture en attendant les secours"], a: [0, 1],
+    e: "Priorité : évacuer et s'éloigner des voies, puis alerter (téléphone du passage à niveau si présent, ou 112).", m: "Panne sur PN : on évacue, puis on alerte." },
+  { id: "SIG-16", c: "SIG", d: 3, q: "Avant un passage à niveau, je vois une balise à 3 bandes rouges. À quelle distance suis-je environ ?",
+    o: ["50 m", "100 m", "150 m"], a: [2],
+    e: "Les balises de position annoncent le passage à niveau : 3 bandes à environ 150 m, 2 bandes à 100 m, 1 bande à 50 m.", m: "Balises PN : 3-2-1 bandes = 150-100-50 m." },
+  { id: "SIG-17", c: "SIG", d: 2, q: "Dans un tunnel, quelles manœuvres sont interdites ?",
+    o: ["Faire demi-tour", "Faire marche arrière", "Circuler avec les feux de croisement"], a: [0, 1],
+    e: "Demi-tour et marche arrière sont interdits dans un tunnel. Les feux de croisement y sont obligatoires.", m: "Tunnel : feux de croisement, ni demi-tour ni marche arrière." },
+  { id: "SIG-18", c: "SIG", d: 3, q: "Un incendie se déclare dans un tunnel et je suis bloqué. Que dois-je faire ?",
+    o: ["Rester dans ma voiture vitres fermées", "Couper le moteur, laisser la clé sur le contact et rejoindre une issue de secours", "Faire demi-tour pour sortir"], a: [1],
+    e: "Il faut quitter le véhicule en laissant la clé (pour que les secours puissent le déplacer) et rejoindre à pied l'issue de secours la plus proche.",
+    t: "Laisser la clé est contre-intuitif mais c'est la bonne réponse.", m: "Feu en tunnel : clé sur le contact, issue de secours." },
+  { id: "SIG-19", c: "SIG", d: 2, q: "J'entre dans une agglomération (panneau blanc à bord rouge portant son nom). Aucun panneau de vitesse n'est présent. Quelle est la limite ?",
+    o: ["50 km/h", "70 km/h", "Celle de la route précédente"], a: [0],
+    e: "Le panneau d'entrée d'agglomération impose à lui seul 50 km/h, sauf autre indication.", m: "Panneau d'entrée de ville = 50." },
+  { id: "SIG-20", c: "SIG", d: 2, q: "Quelle est la différence entre la ligne d'effet d'un stop et celle d'un cédez-le-passage ?",
+    o: ["Stop : ligne continue ; cédez-le-passage : ligne discontinue", "Stop : ligne discontinue ; cédez-le-passage : ligne continue", "Elles sont identiques"], a: [0],
+    e: "La ligne d'arrêt du stop est continue (arrêt obligatoire). Celle du cédez-le-passage est discontinue.", m: "Stop = trait plein ; cédez = pointillés." },
+  { id: "SIG-21", c: "SIG", d: 2, q: "Un panneau rond bleu montre une roue équipée de chaînes. Que signifie-t-il ?",
+    o: ["Chaînes ou équipements spéciaux obligatoires", "Chaînes conseillées", "Route enneigée, fin d'obligation"], a: [0],
+    e: "Un panneau rond bleu est une obligation : ici, les équipements spéciaux (chaînes) sont obligatoires sur au moins deux roues motrices.",
+    m: "Rond bleu = obligation." },
+  { id: "SIG-22", c: "SIG", d: 3, q: "Sur route mouillée, ma voiture commence à « flotter » (aquaplaning). Que dois-je faire ?",
+    o: ["Freiner fortement", "Lever le pied de l'accélérateur et tenir fermement le volant", "Braquer brusquement"], a: [1],
+    e: "En aquaplaning, on lâche l'accélérateur, on tient le volant droit, sans freiner brusquement, jusqu'à ce que les pneus retrouvent l'adhérence.",
+    m: "Aquaplaning : pied levé, volant droit." },
+  { id: "SIG-23", c: "SIG", d: 2, q: "Par temps froid, où le verglas se forme-t-il en priorité ?",
+    o: ["Sur les ponts", "Dans les zones ombragées", "Dans les zones exposées au soleil"], a: [0, 1],
+    e: "Les ponts (refroidis par le dessous) et les zones à l'ombre gèlent en premier.", m: "Verglas : ponts et ombre." },
+  { id: "SIG-24", c: "SIG", d: 2, q: "Par fort vent latéral, à quels endroits dois-je être particulièrement vigilant ?",
+    o: ["En sortie de tunnel", "Sur un viaduc", "Lors du dépassement d'un poids lourd"], a: [0, 1, 2],
+    e: "Sortie de tunnel, viaduc, zone dégagée ou dépassement d'un camion : la rafale arrive brutalement et peut déporter la voiture.",
+    m: "Vent : tunnel, viaduc, camion." },
+
+  // ───────────── ACCIDENT ET PREMIERS SECOURS ─────────────
+  { id: "SEC-01", c: "SEC", d: 1, q: "Je suis témoin d'un accident. Dans quel ordre dois-je agir ?",
+    o: ["Alerter, Protéger, Secourir", "Protéger, Alerter, Secourir", "Secourir, Alerter, Protéger"], a: [1],
+    e: "On protège d'abord (éviter le suraccident), puis on alerte, puis on secourt.", m: "P.A.S. : Protéger, Alerter, Secourir." },
+  { id: "SEC-02", c: "SEC", d: 1, q: "Quel est le numéro d'appel d'urgence européen ?",
+    o: ["15", "112", "114"], a: [1],
+    e: "112 fonctionne partout dans l'Union européenne. 15 = SAMU, 18 = pompiers, 17 = police, 114 = urgence par SMS pour les personnes sourdes ou malentendantes.",
+    m: "112 = urgence européenne." },
+  { id: "SEC-03", c: "SEC", d: 1, q: "Un motard est blessé et conscient. Dois-je lui retirer son casque ?",
+    o: OUI_NON, a: [1],
+    e: "Retirer le casque risque d'aggraver une lésion de la colonne. On ne le retire pas (sauf geste de secours vital par une personne formée).", m: "Jamais toucher au casque du motard." },
+  { id: "SEC-04", c: "SEC", d: 1, q: "Un blessé conscient a soif. Puis-je lui donner à boire ?",
+    o: OUI_NON, a: [1],
+    e: "On ne donne ni à boire ni à manger à un blessé : il pourrait devoir être opéré ou faire une fausse route.", m: "Blessé : rien à boire." },
+  { id: "SEC-05", c: "SEC", d: 2, q: "Une victime est inconsciente mais respire. Que dois-je faire ?",
+    o: ["La mettre en position latérale de sécurité (PLS)", "Commencer un massage cardiaque", "La laisser sur le dos"], a: [0],
+    e: "Inconsciente qui respire = PLS, pour libérer les voies respiratoires. Inconsciente qui ne respire pas = massage cardiaque et défibrillateur.",
+    m: "Respire = PLS ; ne respire pas = massage." },
+  { id: "SEC-06", c: "SEC", d: 2, q: "Dans quel cas puis-je déplacer une victime ?",
+    o: ["Pour l'installer plus confortablement", "En cas de danger réel, immédiat et impossible à écarter (incendie par exemple)", "Jamais, dans aucun cas"], a: [1],
+    e: "On ne déplace une victime qu'en cas de danger vital et immédiat qu'on ne peut supprimer autrement.", m: "Déplacer = seulement si danger immédiat." },
+  { id: "SEC-07", c: "SEC", d: 2, q: "Une victime saigne abondamment. Quel est le premier geste ?",
+    o: ["Appuyer fortement sur la plaie", "Mettre un garrot immédiatement", "Laisser couler"], a: [0],
+    e: "Le premier geste est la compression directe de la plaie (avec un tissu propre si possible).", m: "Hémorragie = j'appuie." },
+  { id: "SEC-08", c: "SEC", d: 2, q: "Quelles informations dois-je donner en alertant les secours ?",
+    o: ["La localisation précise", "Le nombre de victimes", "L'état apparent des victimes", "Le modèle des voitures"], a: [0, 1, 2],
+    e: "Lieu précis, nombre de victimes, leur état, dangers éventuels. Ne raccrochez qu'à la demande de l'opérateur.", m: "Où ? Combien ? Quel état ?" },
+  { id: "SEC-09", c: "SEC", d: 2, q: "Je tombe en panne sur autoroute. Où dois-je attendre les secours ?",
+    o: ["Dans ma voiture, ceinture attachée", "Derrière la glissière de sécurité", "Sur la bande d'arrêt d'urgence, près de la voiture"], a: [1],
+    e: "On sort par le côté opposé à la circulation, gilet enfilé, et on attend derrière la glissière, à l'abri.", m: "Panne sur autoroute = derrière la glissière." },
+];
+
+// Illustrations SVG originales, schématiques (vue de dessus ou panneaux).
+// Chaque scène est une chaîne SVG autonome, couleurs fixes (lisibles sur fond clair ou sombre).
+(function () {
+  const W = 400, H = 240;
+  const wrap = (inner, bg = "#2c3a33") =>
+    `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img">` +
+    `<rect width="${W}" height="${H}" fill="${bg}"/>${inner}</svg>`;
+
+  // Voiture vue de dessus, orientée vers le haut (rot en degrés).
+  const car = (x, y, rot = 0, color = "#3b82f6", label = "") =>
+    `<g transform="translate(${x} ${y}) rotate(${rot})">` +
+    `<rect x="-13" y="-24" width="26" height="48" rx="7" fill="${color}" stroke="#0b1210" stroke-width="1.5"/>` +
+    `<rect x="-10" y="-14" width="20" height="10" rx="2" fill="#cfe3f3" opacity=".9"/>` +
+    `<rect x="-10" y="10" width="20" height="7" rx="2" fill="#cfe3f3" opacity=".7"/>` +
+    `<rect x="-11" y="-24" width="6" height="3" fill="#fff6c4"/><rect x="5" y="-24" width="6" height="3" fill="#fff6c4"/>` +
+    `</g>` +
+    (label ? `<text x="${x}" y="${y + 4}" font-size="11" font-weight="700" text-anchor="middle" fill="#fff" font-family="sans-serif">${label}</text>` : "");
+
+  const bike = (x, y, rot = 0) =>
+    `<g transform="translate(${x} ${y}) rotate(${rot})">` +
+    `<rect x="-2" y="-16" width="4" height="32" rx="2" fill="#111"/>` +
+    `<rect x="-8" y="-5" width="16" height="4" rx="2" fill="#111"/>` +
+    `<circle cx="0" cy="2" r="7" fill="#f59e0b" stroke="#111" stroke-width="1.5"/></g>`;
+
+  const person = (x, y, color = "#f59e0b") =>
+    `<g transform="translate(${x} ${y})"><circle r="7" fill="${color}" stroke="#111" stroke-width="1.5"/><circle r="3" fill="#3b2a1a"/></g>`;
+
+  const label = (x, y, t, size = 12, color = "#ffffff", anchor = "middle") =>
+    `<text x="${x}" y="${y}" font-size="${size}" font-weight="700" text-anchor="${anchor}" fill="${color}" font-family="sans-serif">${t}</text>`;
+
+  const dashV = (x, y1, y2, color = "#f4f4f4", w = 3, dash = "14 10") =>
+    `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="${color}" stroke-width="${w}" stroke-dasharray="${dash}"/>`;
+  const lineV = (x, y1, y2, color = "#f4f4f4", w = 3) =>
+    `<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="${color}" stroke-width="${w}"/>`;
+  const dashH = (y, x1, x2, color = "#f4f4f4", w = 3, dash = "14 10") =>
+    `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${color}" stroke-width="${w}" stroke-dasharray="${dash}"/>`;
+
+  const ROAD = "#4a4f55";
+
+  // Route verticale à double sens (deux voies), avec ou sans trottoirs/bâtiments.
+  const twoLaneRoad = (urban) => {
+    let s = "";
+    if (urban) {
+      s += `<rect x="0" y="0" width="110" height="${H}" fill="#7d7a73"/><rect x="290" y="0" width="110" height="${H}" fill="#7d7a73"/>`;
+      for (let i = 0; i < 4; i++) {
+        s += `<rect x="8" y="${8 + i * 60}" width="70" height="48" rx="3" fill="#9a6b4f"/>`;
+        s += `<rect x="322" y="${8 + i * 60}" width="70" height="48" rx="3" fill="#8a7b6b"/>`;
+      }
+      s += `<rect x="110" y="0" width="12" height="${H}" fill="#a9a59c"/><rect x="278" y="0" width="12" height="${H}" fill="#a9a59c"/>`;
+    } else {
+      for (let i = 0; i < 7; i++) s += `<circle cx="${40 + (i % 2) * 30}" cy="${20 + i * 35}" r="13" fill="#3f7a4a"/><circle cx="${340 + (i % 2) * 25}" cy="${30 + i * 33}" r="12" fill="#3f7a4a"/>`;
+    }
+    s += `<rect x="122" y="0" width="156" height="${H}" fill="${ROAD}"/>`;
+    s += dashV(200, 0, H);
+    return s;
+  };
+
+  const overtake = (urban) => {
+    let s = twoLaneRoad(urban);
+    s += bike(255, 120);
+    s += car(205, 132, 0, "#3b82f6");
+    // flèche de distance
+    s += `<line x1="219" y1="100" x2="248" y2="100" stroke="#fde047" stroke-width="2"/>`;
+    s += `<path d="M219 100 l6 -4 v8z M248 100 l-6 -4 v8z" fill="#fde047"/>`;
+    s += label(233, 92, "?", 14, "#fde047");
+    s += `<rect x="6" y="${H - 30}" width="${urban ? 150 : 170}" height="22" rx="4" fill="#0b1210" opacity=".75"/>`;
+    s += label(12, H - 14, urban ? "En agglomération" : "Hors agglomération", 12, "#fff", "start");
+    return wrap(s, urban ? "#5e5b55" : "#2f5a37");
+  };
+
+  const highway3 = () => {
+    let s = `<rect x="0" y="0" width="${W}" height="${H}" fill="#2f5a37"/>`;
+    s += `<rect x="70" y="0" width="260" height="${H}" fill="${ROAD}"/>`;
+    s += `<rect x="40" y="0" width="30" height="${H}" fill="#6b6f74"/>`; // terre-plein / glissière côté gauche
+    s += lineV(70, 0, H, "#d9d9d9", 3) + lineV(330, 0, H, "#f4f4f4", 3);
+    s += dashV(157, 0, H, "#f4f4f4", 3, "30 18") + dashV(243, 0, H, "#f4f4f4", 3, "30 18");
+    s += car(113, 40, 0, "#9ca3af");
+    s += car(200, 140, 0, "#3b82f6");
+    s += label(200, 200, "MOI", 11, "#fde047");
+    s += label(287, 120, "voie libre", 12, "#c8f7c5");
+    s += label(113, 228, "gauche", 10, "#ddd") + label(200, 228, "centre", 10, "#ddd") + label(287, 228, "droite", 10, "#ddd");
+    return wrap(s);
+  };
+
+  const crossroad = (dirt) => {
+    let s = "";
+    s += `<rect x="160" y="0" width="80" height="${H}" fill="${ROAD}"/>`;
+    if (dirt) {
+      s += `<rect x="0" y="85" width="160" height="70" fill="${ROAD}"/>`;
+      s += `<rect x="240" y="92" width="160" height="56" fill="#8b6a43"/>`;
+      s += `<circle cx="300" cy="110" r="3" fill="#6d5233"/><circle cx="340" cy="132" r="4" fill="#6d5233"/><circle cx="370" cy="105" r="3" fill="#6d5233"/>`;
+      s += label(330, 170, "chemin de terre", 11, "#f3e2c7");
+    } else {
+      s += `<rect x="0" y="85" width="${W}" height="70" fill="${ROAD}"/>`;
+    }
+    s += dashV(200, 0, 85) + dashV(200, 155, H);
+    s += dashH(120, 0, 160);
+    if (!dirt) s += dashH(120, 240, W);
+    s += car(220, 205, 0, "#3b82f6");
+    s += label(220, 238, "MOI", 11, "#fde047");
+    s += car(290, 103, -90, "#ef4444");
+    return wrap(s, "#2f5a37");
+  };
+
+  const roundaboutYield = () => {
+    let s = `<rect x="160" y="0" width="80" height="${H}" fill="${ROAD}"/><rect x="0" y="85" width="${W}" height="70" fill="${ROAD}"/>`;
+    s += `<circle cx="200" cy="120" r="95" fill="${ROAD}"/><circle cx="200" cy="120" r="40" fill="#3f7a4a" stroke="#ddd" stroke-width="3"/>`;
+    s += car(220, 225, 0, "#3b82f6");
+    s += car(148, 150, 135, "#ef4444");
+    // ligne cédez le passage (discontinue) à l'entrée
+    s += dashH(205, 200, 240, "#f4f4f4", 4, "6 5");
+    s += `<g transform="translate(270 200)"><path d="M-16 -12 L16 -12 L0 16 Z" fill="#fff" stroke="#d81e1e" stroke-width="5" stroke-linejoin="round"/></g>`;
+    return wrap(s, "#2f5a37");
+  };
+
+  const arrowLeft = () => {
+    let s = `<rect x="80" y="0" width="240" height="${H}" fill="${ROAD}"/>`;
+    s += lineV(200, 40, H, "#f4f4f4", 3) + dashV(200, 0, 40);
+    s += lineV(80, 0, H) + lineV(320, 0, H);
+    s += lineV(260, 0, 180) + dashV(260, 180, H, "#f4f4f4", 3, "30 18") + dashV(140, 0, H, "#f4f4f4", 3, "30 18");
+    // flèche tourne-à-gauche dans la voie 200-260
+    s += `<path d="M236 150 v-48 h-14 l0 -10 l-16 18 l16 18 v-10 h4 v32z" fill="#f4f4f4"/>`;
+    s += `<path d="M296 150 v-60 h8 l-14 -18 l-14 18 h8 v60z" fill="#f4f4f4"/>`;
+    s += car(230, 205, 0, "#3b82f6");
+    s += label(230, 236, "MOI", 11, "#fde047");
+    return wrap(s, "#5e5b55");
+  };
+
+  const crosswalk = () => {
+    let s = `<rect x="0" y="70" width="${W}" height="100" fill="${ROAD}"/><rect x="0" y="50" width="${W}" height="20" fill="#a9a59c"/><rect x="0" y="170" width="${W}" height="20" fill="#a9a59c"/>`;
+    for (let i = 0; i < 6; i++) s += `<rect x="240" y="${74 + i * 16}" width="50" height="9" fill="#f4f4f4"/>`;
+    s += dashH(120, 0, 230);
+    s += car(120, 145, 90, "#3b82f6");
+    s += person(265, 182);
+    s += `<path d="M265 170 l0 -10" stroke="#fde047" stroke-width="3"/><path d="M259 162 l6 -8 l6 8" fill="none" stroke="#fde047" stroke-width="3"/>`;
+    return wrap(s, "#5e5b55");
+  };
+
+  const sasVelo = () => {
+    let s = `<rect x="100" y="0" width="200" height="${H}" fill="${ROAD}"/>`;
+    s += lineV(200, 0, H);
+    s += `<line x1="200" y1="120" x2="300" y2="120" stroke="#f4f4f4" stroke-width="5"/>`;
+    s += `<line x1="200" y1="70" x2="300" y2="70" stroke="#f4f4f4" stroke-width="5"/>`;
+    s += `<g transform="translate(250 96)" fill="none" stroke="#f4f4f4" stroke-width="3"><circle cx="-14" cy="6" r="9"/><circle cx="14" cy="6" r="9"/><path d="M-14 6 L-4 -8 L8 -8 L14 6 M-4 -8 L2 6 L8 -8"/></g>`;
+    s += car(250, 170, 0, "#3b82f6");
+    s += `<g transform="translate(330 40)"><rect x="-12" y="-30" width="24" height="60" rx="5" fill="#111"/><circle cy="-17" r="7" fill="#ef4444"/><circle cy="0" r="7" fill="#3a3a3a"/><circle cy="17" r="7" fill="#3a3a3a"/></g>`;
+    return wrap(s, "#5e5b55");
+  };
+
+  const dash = (light) => {
+    let s = `<rect x="20" y="20" width="360" height="200" rx="30" fill="#111518"/>`;
+    s += `<circle cx="110" cy="120" r="70" fill="none" stroke="#2a3138" stroke-width="10"/><circle cx="290" cy="120" r="70" fill="none" stroke="#2a3138" stroke-width="10"/>`;
+    for (let i = 0; i <= 8; i++) {
+      const a = (-220 + i * 32.5) * Math.PI / 180;
+      s += `<line x1="${110 + Math.cos(a) * 52}" y1="${120 + Math.sin(a) * 52}" x2="${110 + Math.cos(a) * 62}" y2="${120 + Math.sin(a) * 62}" stroke="#8b949e" stroke-width="2"/>`;
+    }
+    s += `<line x1="110" y1="120" x2="70" y2="90" stroke="#f97316" stroke-width="3"/>`;
+    if (light === "red") {
+      // burette d'huile
+      s += `<g transform="translate(196 120)" fill="#ef4444"><path d="M-30 -2 h8 l4 -6 h10 l4 6 h6 l22 -10 l3 4 l-21 18 v8 h-36 z"/><rect x="-36" y="-6" width="8" height="10" rx="2"/><path d="M31 6 q4 6 0 9 q-4 -3 0 -9z"/></g>`;
+    } else {
+      // feux de route : demi-disque + traits horizontaux
+      s += `<g transform="translate(200 120)" fill="none" stroke="#3b82f6" stroke-width="4"><path d="M4 -16 C 22 -16 22 16 4 16 Z" fill="#3b82f6"/><path d="M-4 -12 h-18 M-4 -4 h-18 M-4 4 h-18 M-4 12 h-18"/></g>`;
+    }
+    return wrap(s, "#20262b");
+  };
+
+  const curb = (yellow) => {
+    let s = `<rect x="0" y="0" width="${W}" height="80" fill="#a9a59c"/><rect x="0" y="80" width="${W}" height="160" fill="${ROAD}"/>`;
+    s += `<rect x="0" y="76" width="${W}" height="6" fill="#d3cfc6"/>`;
+    if (yellow === "cont") s += `<line x1="0" y1="86" x2="${W}" y2="86" stroke="#facc15" stroke-width="6"/>`;
+    if (yellow === "dash") s += `<line x1="0" y1="86" x2="${W}" y2="86" stroke="#facc15" stroke-width="6" stroke-dasharray="22 16"/>`;
+    s += dashH(160, 0, W);
+    s += car(200, 122, -90, "#3b82f6");
+    return wrap(s, "#5e5b55");
+  };
+
+  const busZigzag = () => {
+    let s = `<rect x="0" y="0" width="${W}" height="70" fill="#a9a59c"/><rect x="0" y="70" width="${W}" height="170" fill="${ROAD}"/>`;
+    s += `<rect x="0" y="66" width="${W}" height="6" fill="#d3cfc6"/>`;
+    let p = "M40 78";
+    for (let i = 0; i < 10; i++) p += ` L${60 + i * 32} ${i % 2 ? 78 : 112}`;
+    s += `<path d="${p}" fill="none" stroke="#facc15" stroke-width="5" stroke-linejoin="miter"/>`;
+    s += `<line x1="40" y1="112" x2="360" y2="112" stroke="#facc15" stroke-width="3" stroke-dasharray="8 8" opacity=".0"/>`;
+    s += label(250, 140, "BUS", 18, "#facc15");
+    s += `<g transform="translate(330 40)"><rect x="-2" y="-30" width="4" height="40" fill="#333"/><rect x="-18" y="-46" width="36" height="22" rx="3" fill="#1d4ed8"/>${label(0, -30, "BUS", 11)}</g>`;
+    s += dashH(176, 0, W);
+    s += car(110, 140, -90, "#3b82f6");
+    return wrap(s, "#5e5b55");
+  };
+
+  const busLane = (turn) => {
+    let s = `<rect x="80" y="0" width="240" height="${H}" fill="${ROAD}"/><rect x="320" y="0" width="80" height="${H}" fill="#a9a59c"/>`;
+    if (turn) s += `<rect x="320" y="40" width="80" height="60" fill="${ROAD}"/>`;
+    s += lineV(80, 0, H);
+    s += dashV(160, 0, H, "#f4f4f4", 3, "30 18");
+    if (turn) s += dashV(240, 0, H, "#f4f4f4", 6, "10 10");
+    else s += lineV(240, 0, H, "#f4f4f4", 6);
+    s += `<text x="280" y="160" font-size="22" font-weight="800" text-anchor="middle" fill="#f4f4f4" font-family="sans-serif" transform="rotate(0)">BUS</text>`;
+    s += car(200, 185, 0, "#3b82f6");
+    s += label(200, 224, "MOI", 11, "#fde047");
+    if (turn) s += `<path d="M206 140 q0 -60 90 -70" fill="none" stroke="#fde047" stroke-width="3" stroke-dasharray="6 5"/><path d="M296 70 l-10 -6 l2 12z" fill="#fde047"/>`;
+    return wrap(s, "#5e5b55");
+  };
+
+  const mixedLine = () => {
+    let s = `<rect x="120" y="0" width="160" height="${H}" fill="${ROAD}"/>`;
+    s += lineV(196, 0, H, "#f4f4f4", 3) + dashV(204, 0, H, "#f4f4f4", 3, "18 12");
+    s += lineV(120, 0, H) + lineV(280, 0, H);
+    s += car(240, 175, 0, "#3b82f6") + label(240, 215, "MOI", 11, "#fde047");
+    s += car(240, 70, 0, "#9ca3af");
+    s += label(330, 124, "ligne", 10, "#ddd") + label(330, 138, "discontinue", 10, "#ddd") + label(330, 152, "de mon côté", 10, "#ddd");
+    return wrap(s, "#2f5a37");
+  };
+
+  const rabattement = () => {
+    let s = `<rect x="120" y="0" width="160" height="${H}" fill="${ROAD}"/>`;
+    s += lineV(120, 0, H) + lineV(280, 0, H);
+    s += lineV(200, 0, 70, "#f4f4f4", 3) + dashV(200, 70, H, "#f4f4f4", 3, "30 18");
+    for (const y of [200, 135]) s += `<line x1="190" y1="${y}" x2="218" y2="${y - 40}" stroke="#f4f4f4" stroke-width="7"/><path d="M226 ${y - 52} l-20 6 l14 14z" fill="#f4f4f4"/>`;
+    s += car(170, 210, 0, "#3b82f6");
+    return wrap(s, "#2f5a37");
+  };
+
+  const pnLights = () => {
+    let s = `<rect x="150" y="0" width="100" height="${H}" fill="${ROAD}"/>`;
+    for (let i = 0; i < 2; i++) s += `<rect x="0" y="${84 + i * 50}" width="${W}" height="6" fill="#8c8c8c"/>`;
+    for (let x = 6; x < W; x += 22) s += `<rect x="${x}" y="78" width="10" height="62" fill="#6b4f2f" opacity=".7"/>`;
+    s += `<g transform="translate(320 60)"><rect x="-3" y="0" width="6" height="90" fill="#ddd"/>`;
+    s += `<g transform="translate(0 -10)"><rect x="-26" y="-6" width="52" height="12" fill="#fff" stroke="#d81e1e" stroke-width="2" transform="rotate(30)"/><rect x="-26" y="-6" width="52" height="12" fill="#fff" stroke="#d81e1e" stroke-width="2" transform="rotate(-30)"/></g>`;
+    s += `<rect x="-34" y="24" width="68" height="26" rx="13" fill="#111"/><circle cx="-18" cy="37" r="9" fill="#ef4444"/><circle cx="18" cy="37" r="9" fill="#5b1b1b"/></g>`;
+    s += `<rect x="252" y="60" width="70" height="8" fill="#fff" stroke="#d81e1e" stroke-width="2" transform="rotate(-80 252 64)"/>`;
+    s += car(200, 205, 0, "#3b82f6");
+    return wrap(s, "#2f5a37");
+  };
+
+  // ── Panneaux (fond neutre) ──
+  const SIGN_BG = "#e9ede8";
+  const signWrap = (inner) => wrap(`<g transform="translate(200 120)">${inner}</g>`, SIGN_BG);
+  const triangle = (inner) =>
+    signWrap(`<path d="M0 -92 L92 72 L-92 72 Z" fill="#fff" stroke="#d81e1e" stroke-width="16" stroke-linejoin="round"/>${inner}`);
+
+  const signs = {
+    signAB1: () => triangle(`<g stroke="#111" stroke-width="13" stroke-linecap="butt"><line x1="-28" y1="-10" x2="28" y2="50"/><line x1="28" y1="-10" x2="-28" y2="50"/></g>`),
+    signAB2: () => triangle(`<rect x="-8" y="-38" width="16" height="96" fill="#111"/><rect x="-36" y="14" width="72" height="6" fill="#111"/>`),
+    signYield: () => signWrap(`<path d="M-92 -72 L92 -72 L0 92 Z" fill="#fff" stroke="#d81e1e" stroke-width="16" stroke-linejoin="round"/>`),
+    signStop: () => {
+      const pts = [];
+      for (let i = 0; i < 8; i++) { const a = (22.5 + i * 45) * Math.PI / 180; pts.push(`${(Math.cos(a) * 92).toFixed(1)},${(Math.sin(a) * 92).toFixed(1)}`); }
+      return signWrap(`<polygon points="${pts.join(" ")}" fill="#d81e1e" stroke="#fff" stroke-width="5"/><text y="16" font-size="46" font-weight="800" text-anchor="middle" fill="#fff" font-family="sans-serif">STOP</text>`);
+    },
+    signAB6: () => signWrap(`<rect x="-66" y="-66" width="132" height="132" fill="#fff" stroke="#222" stroke-width="2" transform="rotate(45)"/><rect x="-44" y="-44" width="88" height="88" fill="#f5c400" transform="rotate(45)"/>`),
+    signB6d: () => signWrap(`<circle r="88" fill="#1d4ed8" stroke="#d81e1e" stroke-width="16"/><g stroke="#d81e1e" stroke-width="16"><line x1="-58" y1="-58" x2="58" y2="58"/><line x1="58" y1="-58" x2="-58" y2="58"/></g>`),
+    signB6a1: () => signWrap(`<circle r="88" fill="#1d4ed8" stroke="#d81e1e" stroke-width="16"/><line x1="-58" y1="-58" x2="58" y2="58" stroke="#d81e1e" stroke-width="16"/>`),
+  };
+
+  window.SCENES = {
+    cyclistOut: () => overtake(false),
+    cyclistIn: () => overtake(true),
+    highway3,
+    crossRight: () => crossroad(false),
+    dirtRoad: () => crossroad(true),
+    roundaboutYield,
+    arrowLeft,
+    crosswalk,
+    sasVelo,
+    dashRed: () => dash("red"),
+    dashBlue: () => dash("blue"),
+    yellowCont: () => curb("cont"),
+    yellowDash: () => curb("dash"),
+    busZigzag,
+    busLane: () => busLane(false),
+    busLaneTurn: () => busLane(true),
+    mixedLine,
+    rabattement,
+    pnLights,
+    ...signs,
+  };
+})();
+
+// Moteur pur (sans DOM) : statistiques, répétition espacée, sélection des questions, scores.
+// Testable sous Node : window.Engine.
+(function () {
+  const MIN = 60 * 1000, HOUR = 60 * MIN, DAY = 24 * HOUR;
+  // Intervalles Leitner adaptés à une révision sur 24 h.
+  const INTERVALS = [0, 10 * MIN, 1 * HOUR, 5 * HOUR, 1 * DAY, 3 * DAY];
+  // Répartition d'un test de 40 questions par thème.
+  const EXAM_MIX = { LEG: 6, CON: 5, CIR: 7, QUI: 5, USA: 5, EQU: 5, SIG: 5, SEC: 2 };
+  const PASS = 35;
+
+  const emptyState = () => ({ v: 1, q: {}, sessions: [], sprint: { done: {} }, settings: { examTimer: true, stepTimer: true }, updated: 0 });
+
+  const shuffle = (arr, rnd = Math.random) => {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  };
+
+  const sameSet = (a, b) => a.length === b.length && a.every((x) => b.includes(x));
+  const isCorrect = (question, chosen) => sameSet([...new Set(chosen)].sort(), question.a.slice().sort());
+
+  const stat = (state, id) => state.q[id] || null;
+
+  // Enregistre une réponse. Retourne le nouvel état (immuable).
+  function recordAnswer(state, question, chosen, ms, now = Date.now()) {
+    const ok = isCorrect(question, chosen);
+    const prev = state.q[question.id] || { s: 0, c: 0, w: 0, box: 0, due: 0, rt: 0, last: 0, ok: null, hist: [] };
+    const s = prev.s + 1;
+    let box;
+    if (ok) box = prev.s === 0 ? 3 : Math.min(5, prev.box + 1); // première réponse juste : déjà connue
+    else box = 0;
+    const rt = Math.round(prev.rt ? prev.rt * 0.6 + ms * 0.4 : ms);
+    const hist = (prev.hist || []).concat(ok ? 1 : 0).slice(-8);
+    const next = { s, c: prev.c + (ok ? 1 : 0), w: prev.w + (ok ? 0 : 1), box, due: now + INTERVALS[box], rt, last: now, ok, hist };
+    return { ok, state: { ...state, q: { ...state.q, [question.id]: next }, updated: now } };
+  }
+
+  // Niveau de maîtrise 0-100.
+  function mastery(st) {
+    if (!st || !st.s) return null;
+    const recent = st.hist && st.hist.length ? st.hist.reduce((a, b) => a + b, 0) / st.hist.length : st.c / st.s;
+    const m = (st.box / 5) * 0.6 + recent * 0.4;
+    return Math.round((st.ok ? m : Math.min(m, 0.3)) * 100);
+  }
+
+  const isActiveError = (st) => !!st && st.w > 0 && (st.box < 3 || st.ok === false);
+  const isWeak = (st) => !!st && st.s > 0 && (st.ok === false || st.box < 3);
+
+  // Statistiques par thème.
+  function catStats(state, questions, cats) {
+    const out = {};
+    for (const k of Object.keys(cats)) out[k] = { key: k, n: 0, att: 0, c: 0, w: 0, seen: 0, weak: 0, active: 0 };
+    for (const q of questions) {
+      const o = out[q.c]; if (!o) continue;
+      o.n++;
+      const st = state.q[q.id];
+      if (st && st.s) { o.seen++; o.att += st.s; o.c += st.c; o.w += st.w; if (isWeak(st)) o.weak++; if (isActiveError(st)) o.active++; }
+    }
+    for (const k of Object.keys(out)) {
+      const o = out[k], prior = cats[k].prior || 0;
+      // Taux d'erreur estimé : erreurs observées + a priori issu du résultat officiel (33/40).
+      o.errRate = (o.w + prior * 1.2 + 0.4) / (o.att + 6);
+      o.acc = o.att ? o.c / o.att : null;
+      // Probabilité de réussite estimée : a priori calé pour redonner ≈ 33/40 sans aucune réponse.
+      const p0 = 0.9 - prior * 0.075;
+      o.pSuccess = (o.c + p0 * 4) / (o.att + 4);
+      o.weakness = o.errRate + o.active * 0.04;
+    }
+    return out;
+  }
+
+  function priorityCats(state, questions, cats, n = 3) {
+    const cs = catStats(state, questions, cats);
+    return Object.values(cs).sort((a, b) => b.weakness - a.weakness).slice(0, n);
+  }
+
+  // Estimation du score à l'examen (/40) à partir des thèmes et des examens blancs récents.
+  function readiness(state, questions, cats) {
+    const cs = catStats(state, questions, cats);
+    const total = Object.values(EXAM_MIX).reduce((a, b) => a + b, 0);
+    let est = 0;
+    for (const [k, n] of Object.entries(EXAM_MIX)) est += n * Math.max(0, Math.min(1, cs[k].pSuccess));
+    est = (est / total) * 40;
+    const exams = state.sessions.filter((s) => s.mode === "exam" && s.n === 40).slice(-3);
+    if (exams.length) {
+      const avg = exams.reduce((a, s) => a + s.correct, 0) / exams.length;
+      est = est * 0.5 + avg * 0.5;
+    }
+    const answered = Object.values(state.q).reduce((a, s) => a + s.s, 0);
+    return { score: Math.round(est * 10) / 10, answered, exams: exams.length, confident: answered >= 60 };
+  }
+
+  // Sélection pondérée.
+  function scoreFor(q, state, cs, now, opts = {}) {
+    const st = state.q[q.id];
+    let sc = Math.random() * 1.5;
+    sc += (cs[q.c] ? cs[q.c].weakness : 0.2) * 8;
+    if (!st || !st.s) sc += opts.preferNew ? 3 : 1.2;
+    else {
+      if (st.ok === false) sc += 3.5;
+      if (st.due <= now) sc += 2;
+      else sc -= 2.5 * (st.box / 5);
+      if (st.box >= 4 && st.ok) sc -= 3;
+    }
+    if (opts.hard) sc += q.d * 1.5 + (q.t ? 1 : 0) + (q.a.length > 1 ? 1 : 0);
+    return sc;
+  }
+
+  function pickMix(questions, state, cats, mix, opts = {}) {
+    const now = Date.now();
+    const cs = catStats(state, questions, cats);
+    let picked = [];
+    for (const [c, n] of Object.entries(mix)) {
+      const pool = questions.filter((q) => q.c === c);
+      const ranked = pool
+        .map((q) => {
+          const st = state.q[q.id];
+          let s = Math.random() * 2;
+          if (opts.preferUnseen && (!st || !st.s)) s += 3;
+          if (opts.leastRecent && st) s -= Math.min(3, (now - st.last) < HOUR ? 3 : 0);
+          if (opts.hardShare && q.d === 3) s += 1;
+          if (opts.weighted) s += scoreFor(q, state, cs, now) * 0.3;
+          return { q, s };
+        })
+        .sort((a, b) => b.s - a.s);
+      picked = picked.concat(ranked.slice(0, n).map((x) => x.q));
+    }
+    return shuffle(picked);
+  }
+
+  function buildSession(mode, questions, state, cats, n) {
+    const now = Date.now();
+    const cs = catStats(state, questions, cats);
+    if (mode === "diag") return pickMix(questions, state, cats, EXAM_MIX, { preferUnseen: true });
+    if (mode === "exam") return pickMix(questions, state, cats, EXAM_MIX, { leastRecent: true, hardShare: true });
+    if (mode === "errors") {
+      const errs = questions.filter((q) => isActiveError(state.q[q.id]));
+      return shuffle(errs).sort((a, b) => (state.q[a.id].ok === false ? 0 : 1) - (state.q[b.id].ok === false ? 0 : 1));
+    }
+    let pool = questions, opts = {};
+    if (mode === "hard") { pool = questions.filter((q) => q.d === 3 || q.t || q.a.length > 1); opts.hard = true; }
+    if (mode === "consolidate") {
+      const weak = questions.filter((q) => { const st = state.q[q.id]; return st && st.s && (isWeak(st) || st.due <= now); });
+      pool = weak.length >= 10 ? weak : questions;
+    }
+    const ranked = pool.map((q) => ({ q, s: scoreFor(q, state, cs, now, opts) })).sort((a, b) => b.s - a.s);
+    const size = n || (mode === "hard" ? 20 : 25);
+    // Limite par thème pour garder de la variété (sauf mode ciblé où l'on concentre).
+    const cap = mode === "target" ? Math.ceil(size * 0.45) : Math.ceil(size * 0.35);
+    const per = {}; const out = [];
+    for (const { q } of ranked) {
+      if (out.length >= size) break;
+      per[q.c] = per[q.c] || 0;
+      if (per[q.c] >= cap) continue;
+      per[q.c]++; out.push(q);
+    }
+    return shuffle(out);
+  }
+
+  // Résumé d'une session terminée.
+  function summarize(mode, results, questions, startedAt, now = Date.now()) {
+    const byId = Object.fromEntries(questions.map((q) => [q.id, q]));
+    const firsts = []; const seen = new Set();
+    for (const r of results) { if (seen.has(r.id)) continue; seen.add(r.id); firsts.push(r); }
+    const byCat = {};
+    for (const r of firsts) {
+      const c = byId[r.id].c; byCat[c] = byCat[c] || { n: 0, c: 0 };
+      byCat[c].n++; if (r.ok) byCat[c].c++;
+    }
+    return {
+      id: "s" + now.toString(36), mode, start: startedAt, end: now,
+      n: firsts.length, correct: firsts.filter((r) => r.ok).length,
+      byCat, wrong: firsts.filter((r) => !r.ok).map((r) => r.id),
+    };
+  }
+
+  // Texte compact pour l'assistant.
+  function assistantReport(state, questions, cats) {
+    const cs = catStats(state, questions, cats);
+    const r = readiness(state, questions, cats);
+    const lines = [];
+    lines.push(`Révision code de la route — rapport du ${new Date().toLocaleString("fr-FR")}`);
+    lines.push(`Score estimé : ${r.score}/40 (objectif 35). Réponses données : ${r.answered}.`);
+    lines.push("Par thème (réussite / tentatives / erreurs actives) :");
+    for (const o of Object.values(cs)) lines.push(`- ${cats[o.key].name} : ${o.acc == null ? "—" : Math.round(o.acc * 100) + " %"} / ${o.att} / ${o.active}`);
+    const ex = state.sessions.filter((s) => s.mode === "exam");
+    if (ex.length) lines.push("Examens blancs : " + ex.map((s) => `${s.correct}/${s.n}`).join(", "));
+    const rec = questions.filter((q) => (state.q[q.id] || {}).w >= 1).sort((a, b) => state.q[b.id].w - state.q[a.id].w).slice(0, 15);
+    if (rec.length) {
+      lines.push("Questions ratées (nb d'erreurs, dernière réponse) :");
+      for (const q of rec) { const st = state.q[q.id]; lines.push(`- ${q.id} (${st.w}×, ${st.ok ? "réussie" : "ratée"}) ${q.q}`); }
+    }
+    return lines.join("\n");
+  }
+
+  window.Engine = { INTERVALS, EXAM_MIX, PASS, emptyState, shuffle, isCorrect, recordAnswer, mastery, isActiveError, isWeak, catStats, priorityCats, readiness, buildSession, summarize, assistantReport, stat };
+})();
+
+/* global React, ReactDOM, htm, Engine, QUESTIONS, CATS, SCENES */
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
+const html = htm.bind(React.createElement);
+const E = Engine;
+const QBY = Object.fromEntries(QUESTIONS.map((q) => [q.id, q]));
+const LETTERS = ["A", "B", "C", "D"];
+const LS_KEY = "cdr-state-v1";
+
+const MODES = {
+  diag: { name: "Diagnostic", desc: "40 questions variées sur tous les thèmes. Correction après chaque question.", n: 40, feedback: true },
+  target: { name: "Révision ciblée", desc: "25 questions tirées en priorité dans tes thèmes les plus faibles.", n: 25, feedback: true },
+  errors: { name: "Mes erreurs", desc: "Toutes les questions ratées. Une question ne sort de la liste qu'après 3 bonnes réponses espacées.", feedback: true },
+  hard: { name: "Questions difficiles", desc: "Exceptions, pièges, réponses multiples et petites différences d'énoncé.", n: 20, feedback: true },
+  exam: { name: "Examen blanc", desc: "40 questions, 20 secondes chacune, aucune correction avant la fin. Réussite à 35/40.", n: 40, feedback: false },
+  consolidate: { name: "Consolidation", desc: "Questions fragiles et révisions arrivées à échéance.", n: 25, feedback: true },
+};
+
+const SPRINT = [
+  { title: "Session 1 — ce soir", total: 40, steps: [
+    { id: "s1a", mode: "diag", min: 15, label: "Diagnostic", n: 40 },
+    { id: "s1b", mode: "target", min: 15, label: "Questions ciblées", n: 30 },
+    { id: "s1c", mode: "errors", min: 10, label: "Révision des erreurs" },
+  ] },
+  { title: "Session 2 — demain", total: 120, steps: [
+    { id: "s2a", mode: "exam", min: 30, label: "Examen blanc et correction" },
+    { id: "s2b", mode: "target", min: 30, label: "Questions ciblées", n: 50 },
+    { id: "s2c", mode: "hard", min: 30, label: "Questions difficiles", n: 40 },
+    { id: "s2d", mode: "consolidate", min: 30, label: "Révision et consolidation", n: 40 },
+  ] },
+];
+
+// ───────── Persistance : localStorage + base de l'artifact ─────────
+function loadLocal() {
+  try { const s = JSON.parse(localStorage.getItem(LS_KEY)); if (s && s.v === 1) return s; } catch (e) { /* stockage indisponible */ }
+  return null;
+}
+function saveLocal(s) { try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch (e) { /* ignore */ } }
+
+function validState(s) {
+  return s && typeof s === "object" && s.v === 1 && s.q && typeof s.q === "object" && Array.isArray(s.sessions);
+}
+
+function useStore() {
+  const [state, setState] = useState(() => {
+    const s = loadLocal() || E.emptyState();
+    return { ...E.emptyState(), ...s, settings: { ...E.emptyState().settings, ...(s.settings || {}) } };
+  });
+  const [sync, setSync] = useState("connecting");
+  const dbRef = useRef(null), pending = useRef(null), flying = useRef(false), timer = useRef(null), lastRemote = useRef(0);
+
+  const flush = useCallback(async () => {
+    const db = dbRef.current; const s = pending.current;
+    if (!db || !s || flying.current) return;
+    pending.current = null; flying.current = true; setSync("saving");
+    try {
+      const { run, ...rest } = s;
+      await db.doc("progress/main").set({ updated: s.updated, payload: JSON.stringify(rest) });
+      lastRemote.current = s.updated; setSync("synced");
+    } catch (e) {
+      setSync(e && e.code === "quota_exceeded" ? "full" : "error");
+    } finally {
+      flying.current = false;
+      if (pending.current) timer.current = setTimeout(flush, 1500);
+    }
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    const c = window.claude;
+    if (!c || !c.use) { setSync("local"); return; }
+    const to = setTimeout(() => alive && setSync((x) => (x === "connecting" ? "local" : x)), 10000);
+    c.use("db").then(async (db) => {
+      if (!alive) return;
+      if (!db) { clearTimeout(to); setSync("local"); return; }
+      dbRef.current = db;
+      try {
+        const snap = await db.doc("progress/main").get();
+        clearTimeout(to);
+        if (snap.exists) {
+          const data = snap.data();
+          const remote = JSON.parse(data.payload);
+          setState((cur) => {
+            if (validState(remote) && (remote.updated || 0) > (cur.updated || 0)) {
+              const merged = { ...E.emptyState(), ...remote, run: cur.run };
+              saveLocal(merged); return merged;
+            }
+            if ((cur.updated || 0) > (remote.updated || 0)) { pending.current = cur; setTimeout(flush, 500); }
+            return cur;
+          });
+          lastRemote.current = data.updated || 0;
+        } else {
+          setState((cur) => { if (cur.updated) { pending.current = cur; setTimeout(flush, 500); } return cur; });
+        }
+        setSync("synced");
+      } catch (e) { clearTimeout(to); setSync("error"); }
+    }).catch(() => { clearTimeout(to); setSync("local"); });
+    return () => { alive = false; };
+  }, [flush]);
+
+  const update = useCallback((fn) => {
+    setState((cur) => {
+      const next = typeof fn === "function" ? fn(cur) : fn;
+      saveLocal(next);
+      if (dbRef.current && next.updated !== cur.updated) {
+        pending.current = next;
+        clearTimeout(timer.current); timer.current = setTimeout(flush, 2500);
+      }
+      return next;
+    });
+  }, [flush]);
+
+  useEffect(() => {
+    const h = () => { if (document.visibilityState === "hidden" && pending.current) { clearTimeout(timer.current); flush(); } };
+    document.addEventListener("visibilitychange", h);
+    return () => document.removeEventListener("visibilitychange", h);
+  }, [flush]);
+
+  return [state, update, sync];
+}
+
+// ───────── Utilitaires d'affichage ─────────
+const pct = (x) => (x == null ? "—" : Math.round(x * 100) + " %");
+const fmtDate = (t) => new Date(t).toLocaleString("fr-FR", { weekday: "short", hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" });
+const fmtClock = (ms) => { const s = Math.max(0, Math.round(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+
+function Scene({ id }) {
+  if (!id || !SCENES[id]) return null;
+  return html`<figure className="scene"><div dangerouslySetInnerHTML=${{ __html: SCENES[id]() }}></div><figcaption>Illustration schématique</figcaption></figure>`;
+}
+
+function Bar({ value, tone = "green", marker }) {
+  const v = value == null ? 0 : Math.max(0, Math.min(1, value));
+  return html`<div className="bar"><div className=${"bar-fill " + tone} style=${{ width: v * 100 + "%" }}></div>${marker != null && html`<div className="bar-marker" style=${{ left: marker * 100 + "%" }}></div>`}</div>`;
+}
+
+// ───────── Tableau de bord ─────────
+function Dashboard({ state, go, start }) {
+  const cs = useMemo(() => E.catStats(state, QUESTIONS, CATS), [state]);
+  const prio = useMemo(() => E.priorityCats(state, QUESTIONS, CATS, 3), [state]);
+  const ready = useMemo(() => E.readiness(state, QUESTIONS, CATS), [state]);
+  const all = Object.values(state.q);
+  const answered = all.reduce((a, s) => a + s.s, 0);
+  const correct = all.reduce((a, s) => a + s.c, 0);
+  const weak = QUESTIONS.filter((q) => E.isWeak(state.q[q.id])).length;
+  const active = QUESTIONS.filter((q) => E.isActiveError(state.q[q.id])).length;
+  const seen = all.filter((s) => s.s).length;
+  const exams = state.sessions.filter((s) => s.mode === "exam");
+  const recurring = QUESTIONS.filter((q) => (state.q[q.id] || {}).w >= 1)
+    .sort((a, b) => state.q[b.id].w - state.q[a.id].w || state.q[b.id].last - state.q[a.id].last).slice(0, 8);
+  const next = nextStep(state);
+  const gap = Math.round((E.PASS - ready.score) * 10) / 10;
+
+  return html`<div className="stack">
+    ${state.run && html`<div className="card resume"><div><strong>Session en cours : ${MODES[state.run.mode].name}</strong><div className="muted">Question ${state.run.idx + 1} sur ${state.run.ids.length}</div></div><button className="btn primary" onClick=${() => go("quiz")}>Reprendre</button></div>`}
+
+    <section className="hero card">
+      <div className="hero-score">
+        <div className="eyebrow">Score estimé à l'examen</div>
+        <div className="big"><span className=${ready.score >= E.PASS ? "ok" : "warn"}>${ready.score.toFixed(1)}</span><small>/40</small></div>
+        <div className="muted">${ready.score >= E.PASS ? "Au-dessus du seuil de 35. Consolide." : `Il manque environ ${gap.toFixed(1)} point${gap >= 2 ? "s" : ""} pour atteindre 35.`}${!ready.confident ? " Estimation encore fragile : réponds à au moins 60 questions." : ""}</div>
+        <div className="gauge"><${Bar} value=${ready.score / 40} tone=${ready.score >= E.PASS ? "green" : "blue"} marker=${35 / 40} /><div className="gauge-labels"><span>0</span><span>35</span><span>40</span></div></div>
+      </div>
+      <div className="hero-next">
+        <div className="eyebrow">Prochaine étape du sprint</div>
+        ${next ? html`<div className="next-title">${next.step.label}</div><div className="muted">${next.session} · ${next.step.min} min</div><button className="btn primary" onClick=${() => start(next.step.mode, next.step)}>Lancer</button>`
+          : html`<div className="next-title">Sprint terminé</div><div className="muted">Refais un examen blanc ou tes erreurs.</div><button className="btn primary" onClick=${() => start("exam")}>Examen blanc</button>`}
+      </div>
+    </section>
+
+    <section className="card">
+      <div className="card-head"><h2>À réviser en priorité</h2><button className="btn ghost sm" onClick=${() => start("target")}>Révision ciblée</button></div>
+      <ol className="prio">${prio.map((p, i) => html`<li key=${p.key}>
+        <span className="rank">${i + 1}</span>
+        <div className="prio-body"><div className="prio-name">${CATS[p.key].name}</div>
+        <div className="muted small">${p.att ? `${pct(p.acc)} de réussite sur ${p.att} réponses · ${p.active} erreur${p.active > 1 ? "s" : ""} active${p.active > 1 ? "s" : ""}` : `Pas encore travaillé · ${CATS[p.key].prior >= 2 ? "2 erreurs à l'examen" : CATS[p.key].prior >= 1 ? "1 erreur à l'examen" : "thème transversal"}`}</div></div>
+        <button className="btn ghost sm" onClick=${() => start("target", null, p.key)}>Travailler</button></li>`)}</ol>
+    </section>
+
+    <section className="kpis">
+      <div className="kpi card"><div className="kpi-v">${answered}</div><div className="kpi-l">réponses données</div></div>
+      <div className="kpi card"><div className="kpi-v">${answered ? pct(correct / answered) : "—"}</div><div className="kpi-l">de réussite</div></div>
+      <div className="kpi card"><div className="kpi-v">${weak}</div><div className="kpi-l">questions mal maîtrisées</div></div>
+      <div className="kpi card"><div className="kpi-v">${seen}<small>/${QUESTIONS.length}</small></div><div className="kpi-l">questions vues</div></div>
+    </section>
+
+    <section className="card">
+      <div className="card-head"><h2>Progression par thème</h2><span className="muted small">réussite · questions vues</span></div>
+      <div className="themes">${Object.values(cs).map((o) => html`<div className="theme" key=${o.key}>
+        <div className="theme-top"><span>${CATS[o.key].name}</span><span className="num">${o.att ? pct(o.acc) : "—"}</span></div>
+        <${Bar} value=${o.acc} tone=${o.acc == null ? "blue" : o.acc >= 0.875 ? "green" : o.acc >= 0.7 ? "blue" : "red"} />
+        <div className="muted small">${o.seen}/${o.n} vues${o.active ? ` · ${o.active} erreur${o.active > 1 ? "s" : ""} à retravailler` : ""}</div></div>`)}</div>
+    </section>
+
+    <div className="two">
+      <section className="card">
+        <div className="card-head"><h2>Examens blancs</h2><button className="btn ghost sm" onClick=${() => start("exam")}>Nouveau</button></div>
+        ${exams.length ? html`<div className="exams">${exams.slice(-8).map((s) => html`<div className="exam-col" key=${s.id} title=${fmtDate(s.end)}>
+          <div className="exam-bar-wrap"><div className=${"exam-bar " + (s.correct >= 35 ? "pass" : "fail")} style=${{ height: (s.correct / 40) * 100 + "%" }}></div><div className="exam-line"></div></div>
+          <div className="num small">${s.correct}</div></div>`)}</div><div className="muted small">Ligne : seuil de 35/40.</div>`
+          : html`<p className="muted">Aucun examen blanc pour l'instant. Le sprint en prévoit un demain.</p>`}
+      </section>
+      <section className="card">
+        <div className="card-head"><h2>Erreurs récurrentes</h2><button className="btn ghost sm" disabled=${!active} onClick=${() => start("errors")}>Refaire (${active})</button></div>
+        ${recurring.length ? html`<ul className="rec">${recurring.map((q) => html`<li key=${q.id}><span className=${"pill " + (state.q[q.id].ok ? "pill-ok" : "pill-bad")}>${state.q[q.id].w}×</span><div><div className="small">${q.q}</div><div className="memo-inline">${q.m}</div></div></li>`)}</ul>`
+          : html`<p className="muted">Aucune erreur enregistrée.</p>`}
+      </section>
+    </div>
+
+    <section className="card">
+      <h2>Historique des sessions</h2>
+      ${state.sessions.length ? html`<div className="table-wrap"><table><thead><tr><th>Date</th><th>Mode</th><th className="r">Score</th><th className="r">Durée</th></tr></thead><tbody>
+        ${state.sessions.slice().reverse().slice(0, 15).map((s) => html`<tr key=${s.id}><td>${fmtDate(s.end)}</td><td>${MODES[s.mode] ? MODES[s.mode].name : s.mode}</td><td className="r num">${s.correct}/${s.n}</td><td className="r num">${fmtClock(s.end - s.start)}</td></tr>`)}
+      </tbody></table></div>` : html`<p className="muted">Les sessions terminées apparaîtront ici.</p>`}
+    </section>
+  </div>`;
+}
+
+function nextStep(state) {
+  for (const s of SPRINT) for (const st of s.steps) if (!state.sprint.done[st.id]) return { session: s.title, step: st };
+  return null;
+}
+
+// ───────── Sprint ─────────
+function Sprint({ state, update, start }) {
+  const next = nextStep(state);
+  const toggle = (id) => update((s) => ({ ...s, sprint: { ...s.sprint, done: { ...s.sprint.done, [id]: !s.sprint.done[id] } }, updated: Date.now() }));
+  return html`<div className="stack">
+    <section className="card intro">
+      <h2>Sprint avant examen</h2>
+      <p className="muted">Deux sessions guidées. Chaque étape lance le bon mode avec un minuteur. Une étape se coche toute seule quand tu termines sa série ; tu peux aussi la cocher à la main.</p>
+      <label className="switch"><input id="steptimer" type="checkbox" checked=${state.settings.stepTimer} onChange=${(e) => update((s) => ({ ...s, settings: { ...s.settings, stepTimer: e.target.checked } }))} /> Afficher le minuteur des étapes</label>
+    </section>
+    ${SPRINT.map((sess) => {
+      const done = sess.steps.filter((s) => state.sprint.done[s.id]).length;
+      return html`<section className="card" key=${sess.title}>
+        <div className="card-head"><h2>${sess.title}</h2><span className="muted small num">${done}/${sess.steps.length} · ${sess.total} min</span></div>
+        <${Bar} value=${done / sess.steps.length} />
+        <ol className="steps">${sess.steps.map((st) => {
+          const isNext = next && next.step.id === st.id; const isDone = !!state.sprint.done[st.id];
+          return html`<li key=${st.id} className=${(isDone ? "done " : "") + (isNext ? "next" : "")}>
+            <button className="check" aria-label=${isDone ? "Décocher" : "Cocher"} onClick=${() => toggle(st.id)}>${isDone ? "✓" : ""}</button>
+            <div className="step-body"><div className="step-title">${st.label}</div><div className="muted small">${st.min} min · ${MODES[st.mode].name}${st.n ? ` · jusqu'à ${st.n} questions` : ""}</div></div>
+            <button className=${"btn sm " + (isNext ? "primary" : "ghost")} onClick=${() => start(st.mode, st)}>${isDone ? "Refaire" : "Lancer"}</button></li>`;
+        })}</ol>
+      </section>`;
+    })}
+  </div>`;
+}
+
+// ───────── Modes ─────────
+function Modes({ state, start }) {
+  const active = QUESTIONS.filter((q) => E.isActiveError(state.q[q.id])).length;
+  const order = ["diag", "target", "errors", "hard", "exam"];
+  return html`<div className="modes">${order.map((k, i) => html`<button className="card mode" key=${k} onClick=${() => start(k)} disabled=${k === "errors" && !active}>
+    <div className="mode-n">Mode ${i + 1}</div><div className="mode-name">${MODES[k].name}${k === "errors" ? html` <span className="pill pill-bad">${active}</span>` : ""}</div>
+    <div className="muted small">${k === "errors" && !active ? "Aucune erreur active pour l'instant." : MODES[k].desc}</div></button>`)}</div>`;
+}
+
+// ───────── Quiz ─────────
+function Quiz({ state, update, finish, onQuit }) {
+  const run = state.run;
+  const mode = MODES[run.mode];
+  const q = QBY[run.ids[run.idx]];
+  const [chosen, setChosen] = useState([]);
+  const [feedback, setFeedback] = useState(null);
+  const shownAt = useRef(Date.now());
+  const [now, setNow] = useState(Date.now());
+  const deadline = useRef(Date.now() + 20000);
+  const done = useRef(false);
+  const examTimer = run.mode === "exam" && state.settings.examTimer;
+
+  useEffect(() => { setChosen([]); setFeedback(null); shownAt.current = Date.now(); deadline.current = Date.now() + 20000; done.current = false; }, [run.idx, run.ids[run.idx]]);
+  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 250); return () => clearInterval(t); }, []);
+
+  const validate = (forced) => {
+    if (feedback || done.current) return;
+    const sel = forced || chosen;
+    if (!sel.length && !forced) return;
+    done.current = true;
+    const ms = Date.now() - shownAt.current;
+    update((s) => {
+      const r = E.recordAnswer(s, q, sel, ms);
+      const rr = s.run;
+      const results = rr.results.concat({ id: q.id, chosen: sel, ok: r.ok, ms });
+      let ids = rr.ids, requeued = rr.requeued || {};
+      if (!r.ok && mode.feedback && !requeued[q.id] && rr.mode !== "errors") {
+        const pos = Math.min(ids.length, rr.idx + 5);
+        ids = ids.slice(0, pos).concat(q.id, ids.slice(pos)); requeued = { ...requeued, [q.id]: true };
+      }
+      return { ...r.state, run: { ...rr, results, ids, requeued, answered: true } };
+    });
+    if (mode.feedback) setFeedback({ ok: E.isCorrect(q, sel), chosen: sel });
+    else advance();
+  };
+
+  function advance() {
+    update((s) => {
+      const rr = s.run;
+      if (rr.idx + 1 >= rr.ids.length) return s; // la fin est gérée par finish()
+      return { ...s, run: { ...rr, idx: rr.idx + 1, answered: false } };
+    });
+    if (run.idx + 1 >= run.ids.length) finish();
+  }
+
+  // Temps écoulé à l'examen : validation automatique (réponse vide = fausse).
+  useEffect(() => {
+    if (examTimer && !feedback && !done.current && now > deadline.current) validate(chosen.length ? chosen : ["__none__"]);
+  }, [now]); // eslint-disable-line
+
+  const toggle = (i) => { if (feedback) return; setChosen((c) => (c.includes(i) ? c.filter((x) => x !== i) : c.concat(i))); };
+
+  useEffect(() => {
+    const h = (e) => {
+      if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+      const k = e.key.toUpperCase();
+      const n = { "1": 0, "2": 1, "3": 2, "4": 3, A: 0, B: 1, C: 2, D: 3 }[k];
+      if (n != null && n < q.o.length) { e.preventDefault(); toggle(n); }
+      if (e.key === "Enter") { e.preventDefault(); feedback ? advance() : validate(); }
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  });
+
+  const progress = (run.idx + (feedback ? 1 : 0)) / run.ids.length;
+  const stepLeft = run.stepEnds && state.settings.stepTimer ? run.stepEnds - now : null;
+  const qLeft = examTimer ? deadline.current - now : null;
+  const answeredCount = run.results.length;
+  const okCount = run.results.filter((r) => r.ok).length;
+
+  const optClass = (i) => {
+    if (!feedback) return chosen.includes(i) ? "opt sel" : "opt";
+    const good = q.a.includes(i), picked = feedback.chosen.includes(i);
+    return "opt " + (good ? "good " : "") + (picked && !good ? "bad " : "") + (picked ? "picked" : "");
+  };
+
+  return html`<div className="quiz">
+    <div className="quiz-top">
+      <div className="quiz-meta"><span className="mode-tag">${mode.name}</span><span className="num muted">${run.idx + 1}/${run.ids.length}</span>
+        ${mode.feedback && answeredCount ? html`<span className="num muted">· ${okCount}/${answeredCount} justes</span>` : ""}</div>
+      <div className="timers">
+        ${stepLeft != null && html`<span className=${"timer " + (stepLeft <= 0 ? "late" : "")} title="Temps restant pour l'étape">${stepLeft > 0 ? "Étape " + fmtClock(stepLeft) : "Temps de l'étape écoulé"}</span>`}
+        ${qLeft != null && html`<span className=${"timer " + (qLeft < 5000 ? "late" : "")}>${fmtClock(qLeft)}</span>`}
+      </div>
+    </div>
+    <${Bar} value=${progress} tone="blue" />
+    ${stepLeft != null && stepLeft <= 0 && html`<div className="notice">Le temps prévu pour cette étape est écoulé. Termine ta question puis clique sur « Terminer » pour passer à l'étape suivante.</div>`}
+
+    <article className="card qcard" key=${run.idx + q.id}>
+      <div className="q-head"><span className="cat">${CATS[q.c].short}</span>${q.d === 3 ? html`<span className="pill pill-hard">difficile</span>` : ""}</div>
+      <${Scene} id=${q.img} />
+      <h2 className="q-text">${q.q}</h2>
+      <div className="muted small hint">Une ou plusieurs bonnes réponses. Touches A–D ou 1–4, Entrée pour valider.</div>
+      <div className="opts">${q.o.map((o, i) => html`<button key=${i} className=${optClass(i)} onClick=${() => toggle(i)} aria-pressed=${chosen.includes(i)}>
+        <span className="letter">${LETTERS[i]}</span><span className="opt-text">${o}</span></button>`)}</div>
+
+      ${feedback && html`<div className=${"feedback " + (feedback.ok ? "fb-ok" : "fb-bad")}>
+        <div className="fb-title">${feedback.ok ? "Bonne réponse" : "Mauvaise réponse"}</div>
+        <div className="fb-line"><span className="muted">Bonne réponse :</span> <strong>${q.a.map((i) => LETTERS[i]).join(", ")}</strong>${!feedback.ok ? html` · <span className="muted">ton choix :</span> <strong>${feedback.chosen.filter((x) => typeof x === "number").map((i) => LETTERS[i]).join(", ") || "aucun"}</strong>` : ""}</div>
+        <p>${q.e}</p>
+        ${q.t && html`<p className="trap"><strong>Piège :</strong> ${q.t}</p>`}
+        <div className="memo">${q.m}</div>
+        ${q.r && html`<div className="ref muted small">${q.r}</div>`}
+        ${!feedback.ok && run.mode !== "errors" && html`<div className="muted small">Cette question reviendra dans quelques questions, puis dans tes révisions.</div>`}
+      </div>`}
+    </article>
+
+    <div className="quiz-actions">
+      <button className="btn ghost" onClick=${onQuit}>${answeredCount ? "Terminer" : "Quitter"}</button>
+      ${feedback ? html`<button className="btn primary" onClick=${advance}>${run.idx + 1 >= run.ids.length ? "Voir le bilan" : "Suivante"}</button>`
+        : html`<button className="btn primary" disabled=${!chosen.length} onClick=${() => validate()}>Valider</button>`}
+    </div>
+  </div>`;
+}
+
+// ───────── Bilan ─────────
+function Results({ session, state, start, go }) {
+  if (!session) return html`<div className="card"><p>Aucun bilan à afficher.</p></div>`;
+  const isExam = session.mode === "exam";
+  const ok = session.correct, n = session.n;
+  const cats = Object.entries(session.byCat).map(([k, v]) => ({ k, ...v, r: v.c / v.n })).sort((a, b) => a.r - b.r);
+  const weakC = cats.filter((c) => c.r < 0.8), strongC = cats.filter((c) => c.r >= 0.8);
+  const wrongQs = session.wrong.map((id) => QBY[id]).filter(Boolean);
+  const answers = session.answers || {};
+  return html`<div className="stack">
+    <section className="card hero-res">
+      <div className="eyebrow">${MODES[session.mode].name} · ${fmtDate(session.end)}</div>
+      <div className="big"><span className=${isExam ? (ok >= 35 ? "ok" : "warn") : ok / n >= 0.875 ? "ok" : "warn"}>${ok}</span><small>/${n}</small></div>
+      ${isExam ? html`<div className=${"verdict " + (ok >= 35 ? "ok" : "warn")}>${ok >= 35 ? "Examen réussi (35 ou plus)" : `Échec : ${35 - ok} bonne${35 - ok > 1 ? "s" : ""} réponse${35 - ok > 1 ? "s" : ""} de plus pour réussir`}</div>`
+        : html`<div className="muted">${pct(ok / n)} de réussite au premier essai · durée ${fmtClock(session.end - session.start)}</div>`}
+      <div className="row-btns"><button className="btn primary" onClick=${() => go("home")}>Tableau de bord</button>${wrongQs.length ? html`<button className="btn ghost" onClick=${() => start("errors")}>Refaire mes erreurs</button>` : ""}</div>
+    </section>
+    <div className="two">
+      <section className="card"><h2>Points faibles</h2>${weakC.length ? html`<ul className="plain">${weakC.map((c) => html`<li key=${c.k}><span>${CATS[c.k].name}</span><span className="num bad">${c.c}/${c.n}</span></li>`)}</ul>` : html`<p className="muted">Aucun thème sous 80 % dans cette série.</p>`}</section>
+      <section className="card"><h2>Points forts</h2>${strongC.length ? html`<ul className="plain">${strongC.map((c) => html`<li key=${c.k}><span>${CATS[c.k].name}</span><span className="num good">${c.c}/${c.n}</span></li>`)}</ul>` : html`<p className="muted">Pas encore de thème à 80 %.</p>`}</section>
+    </div>
+    ${wrongQs.length > 0 && html`<section className="card"><h2>Règles à revoir</h2><ul className="rules">${wrongQs.map((q) => html`<li key=${q.id}>${q.m}</li>`)}</ul></section>`}
+    <section className="card">
+      <h2>${isExam ? "Correction complète" : "Mes erreurs de la série"}</h2>
+      ${(isExam ? session.order || [] : session.wrong).map((id) => {
+        const q = QBY[id]; if (!q) return null;
+        const a = answers[id] || []; const good = E.isCorrect(q, a);
+        return html`<details className=${"corr " + (good ? "c-ok" : "c-bad")} key=${id} open=${!good && !isExam}>
+          <summary><span className=${"pill " + (good ? "pill-ok" : "pill-bad")}>${good ? "juste" : "faux"}</span> ${q.q}</summary>
+          <${Scene} id=${q.img} />
+          <ul className="corr-opts">${q.o.map((o, i) => html`<li key=${i} className=${(q.a.includes(i) ? "good " : "") + (a.includes(i) && !q.a.includes(i) ? "bad" : "")}><span className="letter">${LETTERS[i]}</span>${o}${a.includes(i) ? html` <em className="muted">(ton choix)</em>` : ""}</li>`)}</ul>
+          <p>${q.e}</p>${q.t && html`<p className="trap"><strong>Piège :</strong> ${q.t}</p>`}<div className="memo">${q.m}</div>
+        </details>`;
+      })}
+      ${!isExam && !wrongQs.length && html`<p className="muted">Aucune erreur. Bien joué.</p>`}
+    </section>
+  </div>`;
+}
+
+// ───────── Données ─────────
+function Data({ state, update, sync }) {
+  const [text, setText] = useState("");
+  const [msg, setMsg] = useState("");
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [dl, setDl] = useState(null);
+  const report = useMemo(() => E.assistantReport(state, QUESTIONS, CATS), [state]);
+  useEffect(() => { if (window.claude && window.claude.use) window.claude.use("downloads").then(setDl).catch(() => {}); }, []);
+  const exportJson = () => JSON.stringify({ ...state, run: undefined }, null, 0);
+
+  const copy = async (t, label) => {
+    try { await navigator.clipboard.writeText(t); setMsg(label + " copié."); }
+    catch (e) { setText(t); setMsg("Copie automatique refusée : le texte est dans le champ ci-dessous, sélectionne-le et copie-le."); }
+  };
+  const doImport = (raw) => {
+    try {
+      const s = JSON.parse(raw);
+      if (!validState(s)) throw new Error("format");
+      update(() => ({ ...E.emptyState(), ...s, run: null, updated: Date.now() }));
+      setMsg("Données importées : " + Object.keys(s.q).length + " questions et " + s.sessions.length + " sessions.");
+    } catch (e) { setMsg("Import impossible : ce texte n'est pas une sauvegarde valide de l'application."); }
+  };
+  const onFile = (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => doImport(r.result); r.readAsText(f); };
+  const syncText = {
+    connecting: "Connexion à la base de l'artifact…",
+    synced: "Synchronisé : tes résultats sont enregistrés dans la base de l'artifact. Dans la conversation, demande « analyse mes résultats » et Claude les lira directement.",
+    saving: "Enregistrement en cours…",
+    local: "Sauvegarde locale uniquement (navigateur). La base de l'artifact n'est pas accessible dans cette vue : utilise « Copier le rapport » et colle-le dans la conversation.",
+    error: "La base de l'artifact a refusé l'enregistrement. Tes données restent sauvegardées dans ce navigateur.",
+    full: "La base de l'artifact est pleine. Exporte tes données puis réinitialise l'historique.",
+  }[sync];
+
+  return html`<div className="stack">
+    <section className="card"><h2>Sauvegarde et synchronisation</h2>
+      <div className=${"sync-box s-" + sync}><span className="dot"></span><span>${syncText}</span></div>
+      <p className="muted small">Les données sont aussi gardées dans ce navigateur (localStorage). Tu peux fermer la page et revenir plus tard ; la base de l'artifact te permet de reprendre sur un autre appareil connecté au même compte.</p>
+    </section>
+    <section className="card"><h2>Rapport pour l'assistant</h2>
+      <p className="muted small">Résumé compact de tes résultats, à coller dans la conversation si la synchronisation ne fonctionne pas.</p>
+      <pre className="report">${report}</pre>
+      <button className="btn primary" onClick=${() => copy(report, "Rapport")}>Copier le rapport</button>
+    </section>
+    <section className="card"><h2>Exporter / importer</h2>
+      <div className="row-btns">
+        <button className="btn ghost" onClick=${() => copy(exportJson(), "Sauvegarde")}>Copier la sauvegarde</button>
+        ${dl && html`<button className="btn ghost" onClick=${() => dl.save({ filename: "code-route-sauvegarde.json", data: exportJson() }).then(() => setMsg("Fichier enregistré.")).catch(() => setMsg("Téléchargement annulé ou refusé."))}>Télécharger (.json)</button>`}
+        <label className="btn ghost file">Importer un fichier<input id="importfile" type="file" accept=".json,application/json" onChange=${onFile} /></label>
+      </div>
+      <label className="muted small" htmlFor="importtext">Ou colle une sauvegarde ici :</label>
+      <textarea id="importtext" rows="4" value=${text} onChange=${(e) => setText(e.target.value)} placeholder='{"v":1,...}'></textarea>
+      <div className="row-btns"><button className="btn ghost" disabled=${!text.trim()} onClick=${() => doImport(text)}>Importer le texte</button></div>
+      ${msg && html`<div className="notice">${msg}</div>`}
+    </section>
+    <section className="card"><h2>Réglages</h2>
+      <label className="switch"><input id="examtimer" type="checkbox" checked=${state.settings.examTimer} onChange=${(e) => update((s) => ({ ...s, settings: { ...s.settings, examTimer: e.target.checked } }))} /> Limite de 20 secondes par question à l'examen blanc</label>
+      <div className="row-btns">${confirmReset ? html`<span className="small">Tout effacer définitivement ?</span><button className="btn danger sm" onClick=${() => { update(() => ({ ...E.emptyState(), updated: Date.now() })); setConfirmReset(false); setMsg("Progression réinitialisée."); }}>Oui, effacer</button><button className="btn ghost sm" onClick=${() => setConfirmReset(false)}>Annuler</button>`
+        : html`<button className="btn ghost sm" onClick=${() => setConfirmReset(true)}>Réinitialiser la progression</button>`}</div>
+    </section>
+  </div>`;
+}
+
+// ───────── Application ─────────
+const VIEWS = [["home", "Accueil"], ["sprint", "Sprint"], ["modes", "Réviser"], ["data", "Données"]];
+
+function App() {
+  const [state, update, sync] = useStore();
+  const [view, setView] = useState(() => {
+    if (loadLocal() && loadLocal().run) return "quiz"; // reprise automatique d'une série interrompue
+    const h = (location.hash || "").slice(1);
+    return ["home", "sprint", "modes", "data"].includes(h) ? h : "home";
+  });
+  const [lastSession, setLastSession] = useState(null);
+  const [toast, setToast] = useState("");
+
+  const go = (v) => { setView(v); if (["home", "sprint", "modes", "data"].includes(v)) { try { history.replaceState(null, "", "#" + v); } catch (e) { location.hash = v; } } window.scrollTo(0, 0); };
+  useEffect(() => { const h = () => { const v = location.hash.slice(1); if (["home", "sprint", "modes", "data"].includes(v)) setView(v); }; window.addEventListener("hashchange", h); return () => window.removeEventListener("hashchange", h); }, []);
+  useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(""), 3500); return () => clearTimeout(t); }, [toast]);
+
+  const start = (mode, step = null, onlyCat = null) => {
+    let ids;
+    if (onlyCat) {
+      const sub = QUESTIONS.filter((q) => q.c === onlyCat);
+      ids = E.buildSession("target", sub, state, CATS, 15).map((q) => q.id);
+    } else {
+      let m = mode;
+      if (m === "errors" && !QUESTIONS.some((q) => E.isActiveError(state.q[q.id]))) { m = "consolidate"; setToast("Aucune erreur active : série de consolidation à la place."); }
+      ids = E.buildSession(m, QUESTIONS, state, CATS, step && step.n).map((q) => q.id);
+      mode = m;
+    }
+    if (!ids.length) { setToast("Aucune question disponible pour ce mode."); return; }
+    const now = Date.now();
+    update((s) => ({ ...s, run: { mode, ids, idx: 0, results: [], startedAt: now, stepId: step ? step.id : null, stepEnds: step ? now + step.min * 60000 : null, requeued: {} } }));
+    setView("quiz"); window.scrollTo(0, 0);
+  };
+
+  const finish = useCallback(() => {
+    update((s) => {
+      const rr = s.run; if (!rr) return s;
+      if (!rr.results.length) { setLastSession(null); return { ...s, run: null }; }
+      const sum = E.summarize(rr.mode, rr.results, QUESTIONS, rr.startedAt);
+      const answers = {}; for (const r of rr.results) if (!(r.id in answers)) answers[r.id] = r.chosen.filter((x) => typeof x === "number");
+      const order = []; for (const r of rr.results) if (!order.includes(r.id)) order.push(r.id);
+      const full = { ...sum, answers, order };
+      setLastSession(full);
+      const stored = { ...sum, wrong: sum.wrong.slice(0, 40) };
+      const sprint = rr.stepId ? { ...s.sprint, done: { ...s.sprint.done, [rr.stepId]: true } } : s.sprint;
+      return { ...s, run: null, sessions: s.sessions.concat(stored).slice(-80), sprint, updated: Date.now() };
+    });
+    setView("results"); window.scrollTo(0, 0);
+  }, [update]);
+
+  const activeErrors = QUESTIONS.filter((q) => E.isActiveError(state.q[q.id])).length;
+  const showQuiz = view === "quiz" && state.run;
+
+  return html`<div className="app">
+    <header className="top">
+      <div className="brand"><span className="logo" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3 L29 26 H3 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M16 12 v7 M16 22 v1.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></span><span>Code<b>Sprint</b></span></div>
+      <nav>${VIEWS.map(([k, l]) => html`<button key=${k} className=${"nav " + (view === k ? "on" : "")} onClick=${() => go(k)}>${l}${k === "modes" && activeErrors ? html`<span className="badge">${activeErrors}</span>` : ""}</button>`)}</nav>
+      <span className=${"sync-dot s-" + sync} title=${"Synchronisation : " + sync}></span>
+    </header>
+    <main>
+      ${showQuiz ? html`<${Quiz} state=${state} update=${update} finish=${finish} onQuit=${finish} />`
+        : view === "results" && lastSession ? html`<${Results} session=${lastSession} state=${state} start=${start} go=${go} />`
+        : view === "sprint" ? html`<${Sprint} state=${state} update=${update} start=${start} />`
+        : view === "modes" ? html`<${Modes} state=${state} start=${start} />`
+        : view === "data" ? html`<${Data} state=${state} update=${update} sync=${sync} />`
+        : html`<${Dashboard} state=${state} go=${go} start=${start} />`}
+    </main>
+    <footer className="foot muted small">${QUESTIONS.length} questions originales, vérifiées sur les règles en vigueur fin 2026. Elles ne reproduisent pas les questions officielles.</footer>
+    ${toast && html`<div className="toast" role="status">${toast}</div>`}
+  </div>`;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(html`<${App} />`);
+
+</script>
